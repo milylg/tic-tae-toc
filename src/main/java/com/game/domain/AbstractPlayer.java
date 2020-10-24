@@ -57,13 +57,77 @@ public abstract class AbstractPlayer {
         return this;
     }
 
+    public void flushChessBoard(Point point, ChessEnumType chessType) {
+        cache[point.getX()][point.getY()] = chessType.value();
+    }
+
+    /**
+     * TODO:
+     *     Warning:(69, 23) Refactor this method to reduce
+     *     its Cognitive Complexity from 17 to the 15 allowed.
+     *
+     * @param chessType
+     * @return
+     */
+    protected boolean isWin(ChessEnumType chessType) {
+        boolean isWin = true;
+        for (int x = 0; x <= 2; x ++) {
+            isWin &= cache[x][x] == chessType.value();
+        }
+        if (isWin) {
+            return true;
+        }else {
+            isWin = true;
+        }
+
+        for (int x = 0; x <= 2; x ++) {
+            isWin &= cache[x][2-x] == chessType.value();
+        }
+        if (isWin) {
+            return true;
+        }else {
+            isWin = true;
+        }
+
+        for (int x = 0; x <= 2; x ++) {
+            for (int y = 0; y <= 2; y ++) {
+                isWin &= cache[x][y] == chessType.value();
+            }
+            if (isWin) {
+                return true;
+            }else {
+                isWin = true;
+            }
+        }
+
+        for (int x = 0; x <= 2; x ++) {
+            for (int y = 0; y <= 2; y ++) {
+                isWin &= cache[y][x] == chessType.value();
+            }
+            if (isWin) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean isDraw() {
+
+        return false;
+    }
+
+    protected boolean isLose() {
+
+        return false;
+    }
+
+
     /**
      * choose a location at chess
      *
-     * @param pointOfPlayer
      * @return
      */
-    public abstract Point playByAnalyze(Point pointOfPlayer);
+    public abstract Point play();
 
     /**
      * judge self is win
@@ -74,7 +138,7 @@ public abstract class AbstractPlayer {
      *
      * @return
      */
-    protected abstract Result isWin();
+    public abstract Result gameResult();
 
     /**
      * clear data from cache when start before.

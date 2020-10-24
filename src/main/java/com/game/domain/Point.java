@@ -8,14 +8,23 @@ public class Point {
     private int x;
     private int y;
 
+    public Point() {
+
+    }
+
     public Point(double x, double y) {
         this.x = (int)x / 100;
         this.y = (int)y / 100;
     }
 
-    public Point(int x, int y) {
+    public Point setX(int x) {
         this.x = x;
+        return this;
+    }
+
+    public Point setY(int y) {
         this.y = y;
+        return this;
     }
 
     public int getX() {

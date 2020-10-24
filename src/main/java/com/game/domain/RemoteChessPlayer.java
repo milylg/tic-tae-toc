@@ -12,21 +12,17 @@ public class RemoteChessPlayer extends AbstractPlayer {
      * let remote player do some choose (a point)
      * then receive for point of remote player.
      *
-     * @param pointOfPlayer  ai player or remote player
      * @return a point that current player choose
      */
     @Override
-    public Point playByAnalyze(Point pointOfPlayer) {
-        if (pointOfPlayer == null) {
-            return null;
-        }
+    public Point play() {
         // get point by network
 
-        return new Point(1,2);
+        return null;
     }
 
     @Override
-    protected Result isWin() {
+    public Result gameResult() {
         return null;
     }
 

@@ -17,23 +17,33 @@ public class AiChessPlayer extends AbstractPlayer {
     }
 
     private Point randomLocation() {
-        return new Point(random.nextInt(3), random.nextInt(3));
+        return new Point()
+                .setX(random.nextInt(3))
+                .setY(random.nextInt(3));
     }
 
     /**
      *
-     * @param pointOfPlayer
      * @return null if AI is loser
      */
     @Override
-    public Point playByAnalyze(Point pointOfPlayer) {
-
-        return randomLocation();
-    }
-
-    @Override
-    public Result isWin() {
+    public Point play() {
 
         return null;
+    }
+
+
+    @Override
+    public Result gameResult() {
+        if (isWin(chessType)) {
+            return Result.WIN;
+        }
+        if (isDraw()) {
+            return Result.DRAW;
+        }
+        if (isLose()) {
+            return Result.LOSE;
+        }
+        return Result.CONTINUE;
     }
 }

@@ -65,8 +65,14 @@ public class GameInterface {
             circle.setVisible(true);
             Point point = new Point(event.getX(), event.getY());
             flush(circle, point);
-            Point pointOfAiOrRemote = chessPlayer.playByAnalyze(point);
-            flush(chessPlayer.createShape(), pointOfAiOrRemote);
+            Result result = chessPlayer.gameResult();
+            if (result == Result.CONTINUE) {
+                chessPlayer.flushChessBoard(point, ChessEnumType.CIRCLE);
+                Point pointOfAiOrRemote = chessPlayer.play();
+                flush(chessPlayer.createShape(), pointOfAiOrRemote);
+                return;
+            }
+            buildWindow(result);
         }
     }
 
@@ -78,6 +84,11 @@ public class GameInterface {
 
     private void clearCheeses() {
         box.getChildren().clear();
+        // without effect
+        box.setHgap(1.0);
+        box.setVgap(1.0);
+        box.setGridLinesVisible(true);
+        box.setVisible(true);
     }
 
     private void buildConfigNetworkPane() {
@@ -90,6 +101,13 @@ public class GameInterface {
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
+    }
+
+    private void buildWindow(Result result) {
+        Dialog<ButtonType> alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText(result.getInformation());
+        alert.setTitle("Game Over");
+        alert.show();
     }
 
 

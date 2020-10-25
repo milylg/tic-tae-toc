@@ -35,7 +35,7 @@ public class NetworkConfigInterface {
                 .setPort(textPort.getText())
                 .setFirst(cbxFirst.isWrapText());
         if (remoteConnectMessage.isLegitimate()) {
-           boolean isConnected = networkService.connect();
+           boolean isConnected = networkService.connect(remoteConnectMessage);
            if (!isConnected) {
                Dialog<ButtonType> error = new Alert(Alert.AlertType.ERROR);
                error.setContentText("Failed to connect to the other player.");

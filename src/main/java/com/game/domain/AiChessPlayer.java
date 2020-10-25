@@ -23,6 +23,9 @@ public class AiChessPlayer extends AbstractPlayer {
     }
 
     /**
+     * can't use test case to test it,
+     *
+     * because is possibility that test case is error
      *
      * @return null if AI is loser
      */

@@ -1,5 +1,8 @@
 package com.game.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -31,8 +34,36 @@ public class AiChessPlayer extends AbstractPlayer {
      */
     @Override
     public Point play() {
+        List<Point> result = new ArrayList<>(100);
+        List<Point> chooseList = searchPossibilityPoint();
+        List<Map<Integer, Integer>> track = new ArrayList<>();
 
-        return null;
+        // unuseful
+        Point point = Point.builder()
+                .setX(random.nextInt(3))
+                .setY(random.nextInt(3));
+
+        // MinMaxValue Algo
+        // backTrack(result, chooseList, track);
+
+        flushChessBoard(point, chessType);
+        return point;
+    }
+
+    private void backTrack(List<Point> result, List<Point> choose, List<Map<Integer, Integer>> track) {
+        if (isWin(chessType)) {
+            /*
+             * bounder condition
+             *   - is win
+             *   - size equals nine
+             */
+        }
+        // choose the one of empty point
+
+        // back track
+        backTrack(result, choose, track);
+        // undo the choose
+
     }
 
 

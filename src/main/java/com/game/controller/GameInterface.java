@@ -66,10 +66,12 @@ public class GameInterface {
             Point point = new Point(event.getX(), event.getY());
             flush(circle, point);
             chessPlayer.flushChessBoard(point, ChessEnumType.CIRCLE);
+            chessPlayer.setWillPlay(true);
             Result result = chessPlayer.gameResult();
             // AI or Network player can play chess
             if (result == Result.CONTINUE) {
                 Point pointOfAiOrRemote = chessPlayer.play();
+                chessPlayer.setWillPlay(false);
                 flush(chessPlayer.createShape(), pointOfAiOrRemote);
                 if (chessPlayer.gameResult() == Result.WIN) {
                     buildWindow(Result.WIN);

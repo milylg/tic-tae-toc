@@ -3,7 +3,9 @@ package com.game.domain;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * @author VIRIYA
@@ -15,6 +17,7 @@ public abstract class AbstractPlayer {
     protected boolean isUsed;
     private boolean isFirst;
     protected ChessEnumType chessType;
+    protected boolean isWillPlay;
 
     public AbstractPlayer() {
         cache = new int[3][3];
@@ -70,41 +73,37 @@ public abstract class AbstractPlayer {
      * @return
      */
     protected boolean isWin(ChessEnumType chessType) {
-        boolean isWin = true;
-        for (int x = 0; x <= 2; x ++) {
-            isWin &= cache[x][x] == chessType.value();
-        }
-        if (isWin) {
-            return true;
-        }else {
-            isWin = true;
-        }
-
-        for (int x = 0; x <= 2; x ++) {
-            isWin &= cache[x][2-x] == chessType.value();
-        }
-        if (isWin) {
-            return true;
-        }else {
-            isWin = true;
-        }
-
-        for (int x = 0; x <= 2; x ++) {
-            for (int y = 0; y <= 2; y ++) {
-                isWin &= cache[x][y] == chessType.value();
+        int len = cache.length;
+        int val = chessType.value() * 3;
+        // v
+        for (int col = 0; col < len; col++) {
+            for (int row = 0,sum = 0; row < len; row++) {
+                sum += cache[row][col];
+                if (sum == val) {
+                    return true;
+                }
             }
-            if (isWin) {
+        }
+        // h
+        for (int row = 0; row < len; row++) {
+            for (int col = 0, sum = 0; col < len; col++) {
+                sum += cache[row][col];
+                if (sum == val) {
+                    return true;
+                }
+            }
+        }
+
+        for (int row = 0,sum = 0; row < len; row++) {
+            sum += cache[row][len - row - 1];
+            if (sum == val) {
                 return true;
-            }else {
-                isWin = true;
             }
         }
 
-        for (int x = 0; x <= 2; x ++) {
-            for (int y = 0; y <= 2; y ++) {
-                isWin &= cache[y][x] == chessType.value();
-            }
-            if (isWin) {
+        for (int col = 0, sum = 0; col < len; col++) {
+            sum += cache[col][col];
+            if (sum == val) {
                 return true;
             }
         }
@@ -112,12 +111,80 @@ public abstract class AbstractPlayer {
     }
 
     protected boolean isDraw() {
-
-        return false;
+        List<Point> emptyPoints = searchPossibilityPoint();
+        if (!isWillPlay) {
+            return checkIsDrawForCurrentPlayerType(emptyPoints, ChessEnumType.FORK);
+        }
+        return checkIsDrawForCurrentPlayerType(emptyPoints, ChessEnumType.CIRCLE);
     }
 
     protected boolean isLose() {
+        int len = cache.length;
+        // v
+        for (int col = 0; col < len; col++) {
+            int sum = 0;
+            for (int row = 0; row < len; row++) {
+                sum += cache[row][col];
+            }
+            if (sum == 3) {
+                return true;
+            }
+        }
+        // h
+        for (int row = 0; row < len; row++) {
+            int sum = 0;
+            for (int col = 0; col < len; col++) {
+                sum += cache[row][col];
+            }
+            if (sum == 3) {
+                return true;
+            }
+        }
 
+        for (int row = 0, sum = 0; row < len; row++) {
+            sum += cache[row][len - row - 1];
+            if (sum == 3) {
+                return true;
+            }
+        }
+
+        for (int col = 0, sum = 0; col < len; col++) {
+            sum += cache[len - col - 1][col];
+            if (sum == 3) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected List<Point> searchPossibilityPoint() {
+        List<Point> emptyPoints = new ArrayList<>(9);
+        for (int col = 0, len = cache.length; col < len; col++) {
+            for (int row = 0; row < len; row++) {
+                if (cache[col][row] == 0) {
+                    Point point = Point.builder()
+                            .setX(col)
+                            .setY(row);
+                    emptyPoints.add(point);
+                }
+            }
+        }
+        return emptyPoints;
+    }
+
+    protected boolean checkIsDrawForCurrentPlayerType(List<Point> emptyPoints, ChessEnumType chessType) {
+        int x, y;
+        for (Point point : emptyPoints) {
+            x = point.getX();
+            y = point.getY();
+            cache[x][y] = chessType.value();
+            for (int col = 0, len = cache.length; col < len; col++) {
+                for (int row = 0; row < len; row++) {
+
+                }
+            }
+            cache[x][y] = 0;
+        }
         return false;
     }
 
@@ -146,5 +213,9 @@ public abstract class AbstractPlayer {
      * @return
      */
     public abstract Point startPlay();
+
+    public void setWillPlay(boolean startPlaying) {
+        this.isWillPlay = startPlaying;
+    }
 
 }

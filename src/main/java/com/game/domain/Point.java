@@ -17,6 +17,10 @@ public class Point {
         this.y = (int)y / 100;
     }
 
+    public static Point builder() {
+        return new Point();
+    }
+
     public Point setX(int x) {
         this.x = x;
         return this;
@@ -34,4 +38,5 @@ public class Point {
     public int getY() {
         return y;
     }
+
 }

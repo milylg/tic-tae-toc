@@ -64,100 +64,70 @@ public abstract class AbstractPlayer {
         cache[point.getX()][point.getY()] = chessType.value();
     }
 
-    /**
-     * TODO:
-     *     Warning:(69, 23) Refactor this method to reduce
-     *     its Cognitive Complexity from 17 to the 15 allowed.
-     *
-     * @param chessType
-     * @return
-     */
-    protected boolean isWin(ChessEnumType chessType) {
-        int len = cache.length;
-        int val = chessType.value() * 3;
-        // v
-        for (int col = 0; col < len; col++) {
-            for (int row = 0,sum = 0; row < len; row++) {
-                sum += cache[row][col];
-                if (sum == val) {
-                    return true;
-                }
-            }
-        }
-        // h
-        for (int row = 0; row < len; row++) {
-            for (int col = 0, sum = 0; col < len; col++) {
-                sum += cache[row][col];
-                if (sum == val) {
-                    return true;
-                }
-            }
-        }
-
-        for (int row = 0,sum = 0; row < len; row++) {
-            sum += cache[row][len - row - 1];
-            if (sum == val) {
-                return true;
-            }
-        }
-
-        for (int col = 0, sum = 0; col < len; col++) {
-            sum += cache[col][col];
-            if (sum == val) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean isWin() {
+        return checkPlayerState(false);
     }
 
     protected boolean isDraw() {
-        List<Point> emptyPoints = searchPossibilityPoint();
-        if (!isWillPlay) {
-            return checkIsDrawForCurrentPlayerType(emptyPoints, ChessEnumType.FORK);
-        }
-        return checkIsDrawForCurrentPlayerType(emptyPoints, ChessEnumType.CIRCLE);
-    }
-
-    protected boolean isLose() {
         int len = cache.length;
-        // v
-        for (int col = 0; col < len; col++) {
-            int sum = 0;
-            for (int row = 0; row < len; row++) {
-                sum += cache[row][col];
-            }
-            if (sum == 3) {
-                return true;
+        for (int x = 0; x < len; x ++) {
+            for (int y = 0; y < len; y ++) {
+                if (cache[x][y] == 0) {
+                    return false;
+                }
             }
         }
-        // h
-        for (int row = 0; row < len; row++) {
-            int sum = 0;
-            for (int col = 0; col < len; col++) {
-                sum += cache[row][col];
-            }
-            if (sum == 3) {
-                return true;
-            }
-        }
-
-        for (int row = 0, sum = 0; row < len; row++) {
-            sum += cache[row][len - row - 1];
-            if (sum == 3) {
-                return true;
-            }
-        }
-
-        for (int col = 0, sum = 0; col < len; col++) {
-            sum += cache[len - col - 1][col];
-            if (sum == 3) {
-                return true;
-            }
-        }
-        return false;
+        return true;
     }
 
-    protected List<Point> searchPossibilityPoint() {
+    /**
+     * @return true if current player lose
+     */
+    protected boolean isLose() {
+        return checkPlayerState(true);
+    }
+
+    /**
+     * @param ifLose check weather lose if true for player
+     * @return
+     *
+     * IfLose       Condition    Return Result
+     * true           lose         true
+     * true           not lose     false
+     * false          win          true
+     * false          not win      false
+     */
+    private boolean checkPlayerState(boolean ifLose) {
+        int len = cache.length;
+        int val = chessType.value() * (ifLose ? -3 : 3);
+
+        for (int col = 0, sumV, sumH; col < len; col++) {
+            sumV = 0;
+            sumH = 0;
+            for (int row = 0; row < len; row++) {
+                sumV += cache[row][col];
+                sumH += cache[col][row];
+            }
+            if (sumV == val || sumH == val) {
+                return true;
+            }
+        }
+
+        int sumR = 0, sumL = 0;
+
+        for (int index = 0; index < len; index++) {
+            sumR += cache[index][len - index - 1];
+            sumL += cache[index][index];
+        }
+        return sumR == val || sumL == val;
+    }
+
+    /**
+     * TODO: delete it
+     *
+     * @return
+     */
+    protected List<Point> searchFreePoint() {
         List<Point> emptyPoints = new ArrayList<>(9);
         for (int col = 0, len = cache.length; col < len; col++) {
             for (int row = 0; row < len; row++) {
@@ -172,22 +142,6 @@ public abstract class AbstractPlayer {
         return emptyPoints;
     }
 
-    protected boolean checkIsDrawForCurrentPlayerType(List<Point> emptyPoints, ChessEnumType chessType) {
-        int x, y;
-        for (Point point : emptyPoints) {
-            x = point.getX();
-            y = point.getY();
-            cache[x][y] = chessType.value();
-            for (int col = 0, len = cache.length; col < len; col++) {
-                for (int row = 0; row < len; row++) {
-
-                }
-            }
-            cache[x][y] = 0;
-        }
-        return false;
-    }
-
 
     /**
      * choose a location at chess
@@ -197,13 +151,13 @@ public abstract class AbstractPlayer {
     public abstract Point play();
 
     /**
-     * judge self is win
+     * judge self weather wined
      * has three state
      * - win
-     * - tie
+     * - draw
      * - lost
      *
-     * @return
+     * @return state of player in game
      */
     public abstract Result gameResult();
 

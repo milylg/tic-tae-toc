@@ -53,10 +53,10 @@ public class AiChessPlayerTester {
         AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfForkWin);
 
         aiChessPlayer.setChessType(ChessEnumType.FORK);
-        assertFalse(aiChessPlayer.isWin(ChessEnumType.FORK));
+        assertFalse(aiChessPlayer.isWin());
 
         aiChessPlayer.setChessType(ChessEnumType.CIRCLE);
-        assertTrue(aiChessPlayer.isWin(ChessEnumType.CIRCLE));
+        assertTrue(aiChessPlayer.isWin());
     }
 
     @Test
@@ -70,10 +70,10 @@ public class AiChessPlayerTester {
         AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfCircleWin);
 
         aiChessPlayer.setChessType(ChessEnumType.CIRCLE);
-        assertTrue(aiChessPlayer.isWin(ChessEnumType.CIRCLE));
+        assertTrue(aiChessPlayer.isWin());
 
         aiChessPlayer.setChessType(ChessEnumType.FORK);
-        assertFalse(aiChessPlayer.isWin(ChessEnumType.FORK));
+        assertFalse(aiChessPlayer.isWin());
     }
 
     @Test

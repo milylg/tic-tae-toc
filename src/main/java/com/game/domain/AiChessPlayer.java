@@ -30,12 +30,14 @@ public class AiChessPlayer extends AbstractPlayer {
      *
      * because is possibility that test case is error
      *
+     * TODO: Use MaxMinValue algorithm to resolve it
+     *
      * @return null if AI is loser
      */
     @Override
     public Point play() {
         List<Point> result = new ArrayList<>(100);
-        List<Point> chooseList = searchPossibilityPoint();
+        List<Point> chooseList = searchFreePoint();
         List<Map<Integer, Integer>> track = new ArrayList<>();
 
         // unuseful
@@ -51,7 +53,7 @@ public class AiChessPlayer extends AbstractPlayer {
     }
 
     private void backTrack(List<Point> result, List<Point> choose, List<Map<Integer, Integer>> track) {
-        if (isWin(chessType)) {
+        if (isWin()) {
             /*
              * bounder condition
              *   - is win
@@ -69,7 +71,7 @@ public class AiChessPlayer extends AbstractPlayer {
 
     @Override
     public Result gameResult() {
-        if (isWin(chessType)) {
+        if (isWin()) {
             return Result.WIN;
         }
         if (isDraw()) {

@@ -80,7 +80,7 @@ public class AiChessPlayerTester {
     public void testGameResultIsDraw() {
         int[][] chessBoardOfDraw = {
                 { 1, -1,  1},
-                {-1,  0,  1},
+                {-1,  -1,  1},
                 {-1,  1, -1}
         };
         AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfDraw);
@@ -132,4 +132,11 @@ public class AiChessPlayerTester {
 //        aiChessPlayer.setChessType(ChessEnumType.CIRCLE);
 //        assertTrue(aiChessPlayer.isLose());
 //    }
+
+    @Test
+    public void testArr() {
+        int[][] res = new int[4][3];
+        res[3] = new int[]{3,4,3,4,5};
+        assert 4 == res.length;
+    }
 }

@@ -41,6 +41,7 @@ public class GameInterface {
                 .setChoose(true)
                 .setFirst(true);
         Point location = chessPlayer.startPlay();
+        chessPlayer.flushChessBoard(location, ChessEnumType.FORK);
         flush(chessPlayer.createShape(), location);
     }
 
@@ -57,6 +58,8 @@ public class GameInterface {
     /**
      * col = [0 - 2]
      * row = [0 - 2]
+     *
+     * TODO: Event Callback AI player execute progress
      */
     @FXML
     public void clickGrid(MouseEvent event) {
@@ -64,23 +67,28 @@ public class GameInterface {
             Circle circle = new Circle(50);
             circle.setVisible(true);
             Point point = new Point(event.getX(), event.getY());
-            flush(circle, point);
-            chessPlayer.flushChessBoard(point, ChessEnumType.CIRCLE);
-            chessPlayer.setWillPlay(true);
-            Result result = chessPlayer.gameResult();
-            // AI or Network player can play chess
-            if (result == Result.CONTINUE) {
-                Point pointOfAiOrRemote = chessPlayer.play();
-                chessPlayer.setWillPlay(false);
-                flush(chessPlayer.createShape(), pointOfAiOrRemote);
-                if (chessPlayer.gameResult() == Result.WIN) {
-                    buildWindow(Result.WIN);
+            logger.info("people click x = {}, y = {}", point.getX(), point.getY());
+            if (chessPlayer.checkEmptySlot(point)) {
+                flush(circle, point);
+                chessPlayer.flushChessBoard(point, ChessEnumType.CIRCLE);
+                chessPlayer.setWillPlay(true);
+                Result result = chessPlayer.gameResult();
+                logger.info("people after game result is {}", result);
+                // AI or Network player can play chess
+                if (result == Result.CONTINUE) {
+                    Point pointOfAiOrRemote = chessPlayer.play();
+                    logger.info("AI click x = {}, y = {}", pointOfAiOrRemote.getX(), pointOfAiOrRemote.getY());
+                    chessPlayer.setWillPlay(false);
+                    flush(chessPlayer.createShape(), pointOfAiOrRemote);
+                    chessPlayer.flushChessBoard(pointOfAiOrRemote, ChessEnumType.FORK);
+                    Result aiResult = chessPlayer.gameResult();
+                    buildWindow(aiResult);
+                    return;
                 }
-                return;
-            }
-            buildWindow(result);
-        }
-    }
+                buildWindow(result);
+            } // end if
+        } // end if
+    } // end method
 
     private void flush(Shape shape, Point point) {
         if (point != null) {
@@ -110,10 +118,12 @@ public class GameInterface {
     }
 
     private void buildWindow(Result result) {
-        Dialog<ButtonType> alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText(result.getInformation());
-        alert.setTitle("Game Over");
-        alert.show();
+        if (result != Result.CONTINUE) {
+            Dialog<ButtonType> alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText(result.getInformation());
+            alert.setTitle("Game Over");
+            alert.show();
+        }
     }
 
 

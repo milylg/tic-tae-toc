@@ -21,6 +21,16 @@ public class Point {
         return new Point();
     }
 
+    public static Point[][] buildGroup(int[][] groupXY3) {
+        Point[][] points = new Point[groupXY3.length][3];
+        for (int group = 0, len = groupXY3.length; group < len; group ++) {
+            for (int i = 0, index = 0, size = groupXY3[group].length; i < size; i = i + 2, index++) {
+                points[group][index] = new Point().setX(groupXY3[group][i]).setY(groupXY3[group][i + 1]);
+            }
+        }
+        return points;
+    }
+
     public Point setX(int x) {
         this.x = x;
         return this;

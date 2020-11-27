@@ -13,6 +13,9 @@ import java.util.List;
  */
 public abstract class AbstractPlayer {
 
+    protected static final int MAX_ROW = 3;
+    protected static final int MAX_COL = 3;
+
     protected int[][] cache;
     protected boolean isUsed;
     private boolean isFirst;
@@ -61,7 +64,13 @@ public abstract class AbstractPlayer {
     }
 
     public void flushChessBoard(Point point, ChessEnumType chessType) {
-        cache[point.getX()][point.getY()] = chessType.value();
+        cache[point.getY()][point.getX()] = chessType.value();
+        for (int row = 0; row < 3; row ++) {
+            for (int col = 0; col < 3; col ++) {
+                System.out.print("  " + cache[row][col]);
+            }
+            System.out.println();
+        }
     }
 
     protected boolean isWin() {
@@ -70,9 +79,9 @@ public abstract class AbstractPlayer {
 
     protected boolean isDraw() {
         int len = cache.length;
-        for (int x = 0; x < len; x ++) {
-            for (int y = 0; y < len; y ++) {
-                if (cache[x][y] == 0) {
+        for (int[] ints : cache) {
+            for (int y = 0; y < len; y++) {
+                if (ints[y] == 0) {
                     return false;
                 }
             }
@@ -122,31 +131,11 @@ public abstract class AbstractPlayer {
         return sumR == val || sumL == val;
     }
 
-    /**
-     * TODO: delete it
-     *
-     * @return
-     */
-    protected List<Point> searchFreePoint() {
-        List<Point> emptyPoints = new ArrayList<>(9);
-        for (int col = 0, len = cache.length; col < len; col++) {
-            for (int row = 0; row < len; row++) {
-                if (cache[col][row] == 0) {
-                    Point point = Point.builder()
-                            .setX(col)
-                            .setY(row);
-                    emptyPoints.add(point);
-                }
-            }
-        }
-        return emptyPoints;
-    }
-
 
     /**
      * choose a location at chess
      *
-     * @return
+     * @return point
      */
     public abstract Point play();
 
@@ -164,7 +153,7 @@ public abstract class AbstractPlayer {
     /**
      * clear data from cache when start before.
      *
-     * @return
+     * @return point
      */
     public abstract Point startPlay();
 
@@ -172,4 +161,10 @@ public abstract class AbstractPlayer {
         this.isWillPlay = startPlaying;
     }
 
+    /**
+     * check empty point in current chess board
+     * @param point
+     * @return true if empty point
+     */
+    public abstract boolean checkEmptySlot(Point point);
 }

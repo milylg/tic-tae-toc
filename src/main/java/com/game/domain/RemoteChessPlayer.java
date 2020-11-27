@@ -30,4 +30,11 @@ public class RemoteChessPlayer extends AbstractPlayer {
     public Point startPlay() {
         return null;
     }
+
+    @Override
+    public boolean checkEmptySlot(Point point) {
+        return false;
+    }
+
+
 }

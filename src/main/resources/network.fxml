@@ -3,28 +3,47 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<TitledPane fx:controller="com.game.controller.NetworkConfigInterface" animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="270.0" text="Network Configer" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
+<TitledPane fx:controller="com.game.controller.NetworkInterface" animated="false" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="270.0" text="Network Config" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8">
    <content>
       <VBox prefHeight="200.0" prefWidth="100.0">
          <children>
             <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label prefHeight="23.0" prefWidth="78.0" text="IP Address" />
-                  <TextField fx:id = "textIp" prefHeight="23.0" prefWidth="166.0" />
+                  <Label prefHeight="23.0" prefWidth="78.0" text="Listen Port" />
+                  <TextField fx:id = "serverIp" prefHeight="23.0" prefWidth="166.0" />
+               </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <HBox alignment="CENTER_RIGHT" prefHeight="100.0" prefWidth="150.0">
+                     <children>
+                        <Label fx:id = "labelListen" prefHeight="23.0" prefWidth="78.0" text="" />
+                        <Button fx:id="listenBtn" onAction="#listen" mnemonicParsing="false" text="Listen" />
+                     </children>
+                  </HBox>
+               </children>
+            </HBox>
+         </children>
+         <children>
+            <HBox alignment="CENTER" nodeOrientation="LEFT_TO_RIGHT" prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label prefHeight="23.0" prefWidth="78.0" text="TCP IP" />
+                  <TextField fx:id = "textTcpIp" prefHeight="23.0" prefWidth="166.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="51.0" prefWidth="275.0">
                <children>
-                  <Label prefHeight="15.0" prefWidth="79.0" text="Port " />
-                  <TextField fx:id="textPort" prefHeight="23.0" prefWidth="164.0" />
+                  <Label prefHeight="15.0" prefWidth="79.0" text="TCP Port" />
+                  <TextField fx:id="textTcpPort" prefHeight="23.0" prefWidth="164.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
                <children>
                   <CheckBox fx:id="cbxFirst" mnemonicParsing="false" prefHeight="16.0" prefWidth="150.0" text="First Play" textFill="#f4611f" />
+                  <Label prefHeight="15.0" prefWidth="79.0" text="not connect" />
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="150.0">
                      <children>
-                        <Button fx:id="ok" onAction="#clickOk" mnemonicParsing="false" text="OK" />
+                        <Button fx:id="ok" onAction="#clickOk" mnemonicParsing="false" text="Connect" />
                      </children>
                   </HBox>
                </children>

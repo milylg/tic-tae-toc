@@ -1,5 +1,6 @@
 package com.game.application;
 
+import com.game.service.NetworkService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

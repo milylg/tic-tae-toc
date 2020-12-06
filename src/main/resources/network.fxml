@@ -43,7 +43,7 @@
                   <Label prefHeight="15.0" prefWidth="79.0" text="not connect" />
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="150.0">
                      <children>
-                        <Button fx:id="ok" onAction="#clickOk" mnemonicParsing="false" text="Connect" />
+                        <Button fx:id="ok" onAction="#clickOk" mnemonicParsing="false" text="Save" />
                      </children>
                   </HBox>
                </children>

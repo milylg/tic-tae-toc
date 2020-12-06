@@ -8,9 +8,9 @@
    <top>
       <HBox prefHeight="30.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
-            <Button id="ai" onAction="#clickAiPlayer" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="AI" />
-            <Label id="info" prefHeight="30.0" prefWidth="100.0" text="  胜率: " />
-            <Button id="net" onAction="#clickNet" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Net" />
+             <Button id="ai" onAction="#clickAiPlayer" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="AI" />
+             <Button id="conf" onAction="#clickConfig" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Conf" />
+             <Button id="net" onAction="#clickNet" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Net" />
          </children>
       </HBox>
    </top>

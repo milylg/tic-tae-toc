@@ -1,10 +1,5 @@
 package com.game.domain;
 
-import com.sun.istack.internal.NotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -51,7 +46,7 @@ public class AiChessPlayer extends AbstractPlayer {
      * track back direct depth then return result of possibility
      * - max compare
      * - min compare
-     * - score standard
+     * - score rule
      *
      * @param depth track back depth
      * @return random point in points that let ai player wined game
@@ -102,7 +97,8 @@ public class AiChessPlayer extends AbstractPlayer {
             for (int col = 0; col < MAX_COL; col ++) {
                 if (cache[row][col] == 0) {
                     cache[row][col] = chessTypeValue;
-                    bestValue = Math.min(bestValue, max(depth - 1, alpha, Math.min(bestValue, bate)));
+                    bestValue = Math.min(bestValue,
+                            max(depth - 1, alpha, Math.min(bestValue, bate)));
                     cache[row][col] = 0;
                 }
             }
@@ -128,7 +124,8 @@ public class AiChessPlayer extends AbstractPlayer {
             for (int col = 0; col < MAX_COL; col ++) {
                 if (cache[row][col] == 0) {
                     cache[row][col] = chessTypeValue;
-                    bestValue = Math.max(bestValue, min(depth - 1, Math.max(bestValue, alpha), beta));
+                    bestValue = Math.max(bestValue,
+                            min(depth - 1, Math.max(bestValue, alpha), beta));
                     cache[row][col] = 0;
                 }
             }
@@ -175,13 +172,13 @@ public class AiChessPlayer extends AbstractPlayer {
                 for (int i = 0; i < p.length; i++) {
                     if (cache[p[i].getY()][p[i].getX()] == 0) {
                         hasEmpty = true;
-                    } else {
-                        if (chess == 0) {
-                            chess = cache[p[i].getY()][p[i].getX()];
-                        }
-                        if (cache[p[i].getY()][p[i].getX()] == chess) {
-                            count++;
-                        }
+                        continue;
+                    }
+                    if (chess == 0) {
+                        chess = cache[p[i].getY()][p[i].getX()];
+                    }
+                    if (cache[p[i].getY()][p[i].getX()] == chess) {
+                        count++;
                     }
                 }
                 if (hasEmpty && count > 1) {
@@ -195,31 +192,13 @@ public class AiChessPlayer extends AbstractPlayer {
             // check if two in one line
             if (finds[1] > 0) {
                 return -DOUBLE_LINK;
-            } else if (finds[0] > 0) {
+            }
+            if (finds[0] > 0) {
                 return DOUBLE_LINK;
             }
             return CONTINUE;
         }
     }
 
-
-    @Override
-    public boolean checkEmptySlot(@NotNull Point point) {
-        return cache[point.getY()][point.getX()] == 0;
-    }
-
-    @Override
-    public Result gameResult() {
-        if (isWin()) {
-            return Result.WIN;
-        }
-        if (isDraw()) {
-            return Result.DRAW;
-        }
-        if (isLose()) {
-            return Result.LOSE;
-        }
-        return Result.CONTINUE;
-    }
 
 }

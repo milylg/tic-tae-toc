@@ -3,9 +3,6 @@ package com.game.domain;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 
-import java.util.ArrayList;
-import java.util.List;
-
 
 /**
  * @author VIRIYA
@@ -15,17 +12,19 @@ public abstract class AbstractPlayer {
 
     protected static final int MAX_ROW = 3;
     protected static final int MAX_COL = 3;
+    public static final Shape DEFAULT_SHAPE = new Circle(50);
 
     protected int[][] cache;
     protected boolean isUsed;
-    private boolean isFirst;
+    protected boolean startPlay;
     protected ChessEnumType chessType;
     protected boolean isWillPlay;
+
 
     public AbstractPlayer() {
         cache = new int[3][3];
         isUsed = false;
-        isFirst = false;
+        startPlay = false;
         chessType = ChessEnumType.CIRCLE;
     }
 
@@ -53,14 +52,23 @@ public abstract class AbstractPlayer {
         return this;
     }
 
-    public AbstractPlayer setFirst(boolean isFirst) {
-        this.isFirst = isFirst;
+    public AbstractPlayer setStartPlay(boolean isFirst) {
+        this.startPlay = isFirst;
         return this;
     }
+
+    public boolean isFirstPlay() {
+        return startPlay;
+    }
+
 
     public AbstractPlayer setChessType(ChessEnumType type) {
         this.chessType = type;
         return this;
+    }
+
+    public ChessEnumType getChessType() {
+        return chessType;
     }
 
     public void flushChessBoard(Point point, ChessEnumType chessType) {
@@ -140,15 +148,26 @@ public abstract class AbstractPlayer {
     public abstract Point play();
 
     /**
-     * judge self weather wined
+     * judge self if wined
      * has three state
-     * - win
-     * - draw
-     * - lost
+     * <p>- win</p>
+     * <p>- draw</p>
+     * <p>- lost</p>
      *
      * @return state of player in game
      */
-    public abstract Result gameResult();
+    public Result gameResult() {
+        if (isWin()) {
+            return Result.WIN;
+        }
+        if (isDraw()) {
+            return Result.DRAW;
+        }
+        if (isLose()) {
+            return Result.LOSE;
+        }
+        return Result.CONTINUE;
+    }
 
     /**
      * clear data from cache when start before.
@@ -164,7 +183,10 @@ public abstract class AbstractPlayer {
     /**
      * check empty point in current chess board
      * @param point
-     * @return true if empty point
+     * @return true if not empty point
      */
-    public abstract boolean checkEmptySlot(Point point);
+    public boolean checkNotEmptySlot(Point point) {
+        return cache[point.getY()][point.getX()] != 0;
+    }
+
 }

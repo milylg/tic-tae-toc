@@ -1,10 +1,13 @@
 package com.game.domain;
 
+import java.io.Serializable;
+
 /**
  * @author VIRIYA
  * @create 2020/10/24 1:08
  */
-public class Point {
+public class Point implements Serializable {
+
     private int x;
     private int y;
 
@@ -49,4 +52,11 @@ public class Point {
         return y;
     }
 
+    @Override
+    public String toString() {
+        return "Point{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
 }

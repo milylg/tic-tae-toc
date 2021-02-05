@@ -9,16 +9,22 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
+ *
+ * remote client for test
+ *
  * @user : VIRIYA
  * @create : 2020/12/5 15:49
  */
 public class RemoteLogic extends Application {
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("main.fxml"));
         primaryStage.setTitle("Tic-Tac-Toe");
         primaryStage.setScene(new Scene(root, 300, 330));
         primaryStage.show();
+
+        // for easy test to config network params
         NetworkService service = NetworkService.getInstance();
         service.startListen(9999);
         ConnectMessage message = new ConnectMessage();

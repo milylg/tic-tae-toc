@@ -2,12 +2,12 @@ package com.game.controller;
 
 import com.game.domain.*;
 import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Fork;
+import com.game.domain.value.Plot;
 import com.game.domain.value.Result;
 import com.game.net.ChessLocation;
 import com.game.service.NetworkService;
 import javafx.application.Platform;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * @author VIRIYA
@@ -33,45 +32,37 @@ public class GameInterface {
 
     private static Logger logger = LoggerFactory.getLogger("com.game.controller");
 
-    @FXML
-    private Button conf;
+    private static AbstractPlayer chessPlayer;
+    private static NetworkService networkService;
+    private static boolean isRemotePlayer = false;
 
     @FXML
     private GridPane box;
 
-    @FXML
-    private Button net;
-
-    private static AbstractPlayer chessPlayer;
-    private static NetworkService networkService;
-
-    private static boolean isRemotePlayer = false;
-
     @FunctionalInterface
     public interface FlushBoardCallback {
-        /**
+        /*
          * service invoke it to flush view
-         * @param plot
-         * @param type
          */
-        void call(Plot plot, ChessEnumType type);
+        void callbackFlushView(Plot plot, ChessEnumType type);
     }
 
     @FunctionalInterface
     public interface HitMessageCallback {
-        void call(Result result);
+        void showHintMessageDialog(Result result);
     }
 
     @FunctionalInterface
     public  interface FirstPlayCallback {
+
         default void createRemotePlayer() {
             chessPlayer = PlayerFactory.createRemotePlayer()
-                    .setChoose(true)
                     .setChessType(ChessEnumType.FORK)
-                    .clearCache();
+                    .clearChessCache();
             isRemotePlayer = true;
         }
-        void call();
+
+        void buildSelectFirstPlayDialog();
     }
 
     public GameInterface() {
@@ -108,11 +99,7 @@ public class GameInterface {
                 buildFirstPlayPane();
                 clearCheeses();
             });
-            // chessPlayer.setWillPlay(networkService.isFirst());
             networkService.connect();
-//            // TODO: refactor it
-//            networkService.send("FIRST:" + chessPlayer.isFirstPlay());
-//            logger.info("I first play? : " + (chessPlayer.isFirstPlay() ? "yes": "no"));
         });
         logger.info("controller initialize");
     }
@@ -124,8 +111,7 @@ public class GameInterface {
         isRemotePlayer = false;
         chessPlayer = PlayerFactory.createAiPlayer()
                 .setChessType(ChessEnumType.FORK)
-                .clearCache()
-                .setChoose(true)
+                .clearChessCache()
                 .setStartPlay(true);
         Plot location = chessPlayer.startPlay();
         chessPlayer.flushChessBoard(location, ChessEnumType.FORK);
@@ -138,23 +124,29 @@ public class GameInterface {
     public void clickNet(ActionEvent event) {
         clearCheeses();
         isRemotePlayer = true;
+        if (connectPartner(networkService)) {
+            return;
+        }
+
+        // chess type is fork when first play
+        chessPlayer = PlayerFactory.createRemotePlayer()
+                .defaultChessType()
+                .clearChessCache();
+
+        sendRequestForStartGame();
+    }
+
+    static boolean connectPartner(NetworkService networkService) {
         if (!networkService.getConnectResult()) {
             boolean isConnected = networkService.connect();
             if (!isConnected) {
                 Dialog<ButtonType> error = new Alert(Alert.AlertType.ERROR);
                 error.setContentText("Failed to connect to the another player.");
                 error.show();
-                return;
+                return true;
             }
         }
-
-        // chess type is fork when first play
-        chessPlayer = PlayerFactory.createRemotePlayer()
-                .setChessType(ChessEnumType.CIRCLE)
-                .setChoose(true)
-                .clearCache();
-
-        sendRequestForStartGame();
+        return false;
     }
 
 
@@ -186,7 +178,7 @@ public class GameInterface {
             return;
         }
 
-        logger.info("Now, I can play ?" + (networkService.isFirst() ? "yes" : "no"));
+        logger.info("Now, I can play ?" + (networkService.isFirst() ? " yes" : " no"));
 
         if (!networkService.isFirst()) {
             return;
@@ -204,13 +196,29 @@ public class GameInterface {
         // notify remote chess board
         networkService.send(location);
         networkService.setFirst(false);
-        logger.info("Now, I can play ?" + (networkService.isFirst() ? "yes" : "no"));
+        logger.info("Now, I can play ?" + (networkService.isFirst() ? " yes" : " no"));
         if (gameResult == Result.CONTINUE) {
             return ;
         }
         buildWindow(gameResult);
         // as another
-        networkService.send(gameResult);
+        sendGameResultToPartner(gameResult);
+    }
+
+    private void sendGameResultToPartner(Result gameResult) {
+        switch (gameResult) {
+            case WIN:
+                networkService.send(Result.LOSE);
+                break;
+            case LOSE:
+                networkService.send(Result.WIN);
+                break;
+            case DRAW:
+                networkService.send(Result.DRAW);
+                break;
+            default:
+                break;
+        }
     }
 
 

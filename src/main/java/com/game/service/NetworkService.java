@@ -127,18 +127,18 @@ public class NetworkService {
 
                         // message class type : 1. ChessLocation 2. Result
                         if (message instanceof ChessLocation) {
-                            flushBoardCallback.call(((ChessLocation) message).getPoint(), ((ChessLocation) message).getChessEnumType());
+                            flushBoardCallback.callbackFlushView(((ChessLocation) message).getPoint(), ((ChessLocation) message).getChessEnumType());
                             setFirst(true);
                         } else if (message instanceof Result) {
                             // call back game result dialog
-                            hitMessageCallback.call((Result) message);
+                            hitMessageCallback.showHintMessageDialog((Result) message);
                         } else {
                             // ack for request of another client
                             // callback method to show panel that who is first play
                             if (message.equals("REQUEST")) {
 
                                 firstPlayCallback.createRemotePlayer();
-                                firstPlayCallback.call();
+                                firstPlayCallback.buildSelectFirstPlayDialog();
                                 logger.info("first play");
                             }
                             if (message.equals("AGREE:true")) {
@@ -214,7 +214,6 @@ public class NetworkService {
             return isSuccessConnect;
 
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("connect exception: " + e.getMessage());
             isSuccessConnect = false;
             return false;

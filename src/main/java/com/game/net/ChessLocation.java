@@ -1,7 +1,7 @@
 package com.game.net;
 
 import com.game.domain.value.ChessEnumType;
-import com.game.domain.Plot;
+import com.game.domain.value.Plot;
 
 import java.io.Serializable;
 

@@ -1,6 +1,7 @@
 package com.game.domain;
 
 import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Plot;
 import com.game.domain.value.Result;
 
 import java.util.Random;
@@ -9,7 +10,7 @@ import java.util.Random;
  * @author VIRIYA
  * @create 2020/10/24 1:02
  */
-public class AiChessPlayer extends AbstractPlayer {
+public class AiPlayer extends AbstractPlayer {
 
     private Random random = new Random();
     private ScoreRule scoreRule = new ScoreRule();
@@ -17,7 +18,7 @@ public class AiChessPlayer extends AbstractPlayer {
 
     @Override
     public Plot startPlay() {
-        clearCache();
+        clearChessCache();
         return randomLocation();
     }
 

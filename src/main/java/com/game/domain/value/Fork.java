@@ -1,4 +1,4 @@
-package com.game.domain;
+package com.game.domain.value;
 
 import javafx.scene.effect.Light;
 import javafx.scene.shape.LineTo;

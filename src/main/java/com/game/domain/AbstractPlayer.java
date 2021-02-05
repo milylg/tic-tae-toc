@@ -1,6 +1,8 @@
 package com.game.domain;
 
 import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Fork;
+import com.game.domain.value.Plot;
 import com.game.domain.value.Result;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
@@ -18,7 +20,6 @@ public abstract class AbstractPlayer {
     private static final int CHESS_CIRCLE_RADIUS = 50;
 
     protected int[][] cache;
-    protected boolean isUsed;
     protected boolean startPlay;
     protected ChessEnumType chessType;
     protected boolean isWillPlay;
@@ -26,10 +27,7 @@ public abstract class AbstractPlayer {
 
     public AbstractPlayer() {
         cache = new int[3][3];
-        isUsed = false;
         startPlay = false;
-        // default type
-        chessType = ChessEnumType.CIRCLE;
     }
 
     public Shape createShape() {
@@ -42,17 +40,12 @@ public abstract class AbstractPlayer {
     }
 
 
-    public AbstractPlayer clearCache() {
+    public AbstractPlayer clearChessCache() {
         for (int i = 0, len = cache.length; i < len; i++) {
             for (int j = 0; j < len; j++) {
                 cache[i][j] = 0;
             }
         }
-        return this;
-    }
-
-    public AbstractPlayer setChoose(boolean used) {
-        this.isUsed = used;
         return this;
     }
 
@@ -71,13 +64,20 @@ public abstract class AbstractPlayer {
         return this;
     }
 
+    public AbstractPlayer defaultChessType() {
+        // default type
+        chessType = ChessEnumType.CIRCLE;
+        return this;
+    }
+
+
     public ChessEnumType getChessType() {
         return chessType;
     }
 
     public void flushChessBoard(Plot plot, ChessEnumType chessType) {
         cache[plot.getY()][plot.getX()] = chessType.value();
-        //logChessBoardInfo();
+        // logChessBoardInfo();
     }
 
     @Ignore

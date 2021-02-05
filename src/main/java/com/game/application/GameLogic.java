@@ -19,6 +19,8 @@ public class GameLogic extends Application {
         primaryStage.setTitle("Tic-Tac-Toe");
         primaryStage.setScene(new Scene(root, 300, 330));
         primaryStage.show();
+
+        // for easy test  to config network params
         NetworkService service = NetworkService.getInstance();
         service.startListen(8888);
         ConnectMessage message = new ConnectMessage();

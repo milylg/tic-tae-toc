@@ -1,4 +1,4 @@
-package com.game.domain;
+package com.game.domain.value;
 
 import java.io.Serializable;
 
@@ -16,8 +16,8 @@ public class Plot implements Serializable {
     }
 
     public Plot(double x, double y) {
-        this.x = (int)x / 100;
-        this.y = (int)y / 100;
+        this.x = (int) x / 100;
+        this.y = (int) y / 100;
     }
 
     public static Plot builder() {
@@ -26,9 +26,13 @@ public class Plot implements Serializable {
 
     public static Plot[][] buildGroup(int[][] groupXY3) {
         Plot[][] coordinates = new Plot[groupXY3.length][3];
-        for (int group = 0, len = groupXY3.length; group < len; group ++) {
-            for (int i = 0, index = 0, size = groupXY3[group].length; i < size; i = i + 2, index++) {
-                coordinates[group][index] = new Plot().setX(groupXY3[group][i]).setY(groupXY3[group][i + 1]);
+        for (int group = 0, len = groupXY3.length; group < len; group++) {
+            for (int i = 0, index = 0, size = groupXY3[group].length;
+                 i < size;
+                 i = i + 2, index++) {
+                coordinates[group][index] =
+                        Plot.builder().setX(groupXY3[group][i])
+                                .setY(groupXY3[group][i + 1]);
             }
         }
         return coordinates;

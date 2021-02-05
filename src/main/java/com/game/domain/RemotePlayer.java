@@ -1,11 +1,13 @@
 package com.game.domain;
 
 
+import com.game.domain.value.Plot;
+
 /**
  * @author VIRIYA
  * @create 2020/10/24 2:15
  */
-public class RemoteChessPlayer extends AbstractPlayer {
+public class RemotePlayer extends AbstractPlayer {
 
     /**
      * message of player send to other player
@@ -16,12 +18,12 @@ public class RemoteChessPlayer extends AbstractPlayer {
      */
     @Override
     public Plot play() {
-        return null;
+        throw new UnsupportedOperationException("play");
     }
 
     @Override
     public Plot startPlay() {
-        return null;
+        throw new UnsupportedOperationException("startPlay");
     }
 
 }

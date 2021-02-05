@@ -4,17 +4,17 @@ package com.game.net;
  * @user : VIRIYA
  * @create : 2020/11/29 19:03
  */
-public class ConnectMessage {
+public class ConnectParams {
 
     private String ip;
     private String port;
 
-    public ConnectMessage setIp(String ip) {
+    public ConnectParams setIp(String ip) {
         this.ip = ip;
         return this;
     }
 
-    public ConnectMessage setPort(String port) {
+    public ConnectParams setPort(String port) {
         this.port = port;
         return this;
     }

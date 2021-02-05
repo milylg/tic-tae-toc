@@ -1,5 +1,7 @@
 package com.game.domain;
 
+import com.game.domain.value.PlayerEnumType;
+
 import java.util.EnumMap;
 
 /**
@@ -38,7 +40,8 @@ public class PlayerFactory {
         if (players.containsKey(PlayerEnumType.AI)) {
             return players.get(PlayerEnumType.AI);
         }
-        AbstractPlayer aiChessPlayer = new AiChessPlayer();
+        AbstractPlayer aiChessPlayer = new AiPlayer();
+        aiChessPlayer.defaultChessType();
         players.put(PlayerEnumType.AI,aiChessPlayer);
         return aiChessPlayer;
     }
@@ -48,7 +51,8 @@ public class PlayerFactory {
         if (players.containsKey(PlayerEnumType.NET)) {
             return players.get(PlayerEnumType.NET);
         }
-        AbstractPlayer aiChessPlayer = new RemoteChessPlayer();
+        AbstractPlayer aiChessPlayer = new RemotePlayer();
+        aiChessPlayer.defaultChessType();
         players.put(PlayerEnumType.NET,aiChessPlayer);
         return aiChessPlayer;
     }

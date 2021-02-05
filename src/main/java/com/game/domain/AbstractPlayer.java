@@ -1,10 +1,12 @@
 package com.game.domain;
 
+import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Fork;
+import com.game.domain.value.Plot;
+import com.game.domain.value.Result;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
-
-import java.util.ArrayList;
-import java.util.List;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 
 /**
@@ -15,23 +17,20 @@ public abstract class AbstractPlayer {
 
     protected static final int MAX_ROW = 3;
     protected static final int MAX_COL = 3;
+    private static final int CHESS_CIRCLE_RADIUS = 50;
 
     protected int[][] cache;
-    protected boolean isUsed;
-    private boolean isFirst;
     protected ChessEnumType chessType;
     protected boolean isWillPlay;
 
+
     public AbstractPlayer() {
         cache = new int[3][3];
-        isUsed = false;
-        isFirst = false;
-        chessType = ChessEnumType.CIRCLE;
     }
 
     public Shape createShape() {
         if (chessType == ChessEnumType.CIRCLE) {
-            Shape circle = new Circle(50);
+            Shape circle = new Circle(CHESS_CIRCLE_RADIUS);
             circle.setVisible(true);
             return circle;
         }
@@ -39,7 +38,7 @@ public abstract class AbstractPlayer {
     }
 
 
-    public AbstractPlayer clearCache() {
+    public AbstractPlayer clearChessCache() {
         for (int i = 0, len = cache.length; i < len; i++) {
             for (int j = 0; j < len; j++) {
                 cache[i][j] = 0;
@@ -48,23 +47,30 @@ public abstract class AbstractPlayer {
         return this;
     }
 
-    public AbstractPlayer setChoose(boolean used) {
-        this.isUsed = used;
-        return this;
-    }
-
-    public AbstractPlayer setFirst(boolean isFirst) {
-        this.isFirst = isFirst;
-        return this;
-    }
 
     public AbstractPlayer setChessType(ChessEnumType type) {
         this.chessType = type;
         return this;
     }
 
-    public void flushChessBoard(Point point, ChessEnumType chessType) {
-        cache[point.getY()][point.getX()] = chessType.value();
+    public AbstractPlayer defaultChessType() {
+        // default type
+        chessType = ChessEnumType.CIRCLE;
+        return this;
+    }
+
+
+    public ChessEnumType getChessType() {
+        return chessType;
+    }
+
+    public void flushChessBoard(Plot plot, ChessEnumType chessType) {
+        cache[plot.getY()][plot.getX()] = chessType.value();
+        // logChessBoardInfo();
+    }
+
+    @Ignore
+    private void logChessBoardInfo() {
         for (int row = 0; row < 3; row ++) {
             for (int col = 0; col < 3; col ++) {
                 System.out.print("  " + cache[row][col]);
@@ -137,25 +143,36 @@ public abstract class AbstractPlayer {
      *
      * @return point
      */
-    public abstract Point play();
+    public abstract Plot play();
 
     /**
-     * judge self weather wined
+     * judge self if wined
      * has three state
-     * - win
-     * - draw
-     * - lost
+     * <p>- win</p>
+     * <p>- draw</p>
+     * <p>- lost</p>
      *
      * @return state of player in game
      */
-    public abstract Result gameResult();
+    public Result gameResult() {
+        if (isWin()) {
+            return Result.WIN;
+        }
+        if (isDraw()) {
+            return Result.DRAW;
+        }
+        if (isLose()) {
+            return Result.LOSE;
+        }
+        return Result.CONTINUE;
+    }
 
     /**
      * clear data from cache when start before.
      *
      * @return point
      */
-    public abstract Point startPlay();
+    public abstract Plot startPlay();
 
     public void setWillPlay(boolean startPlaying) {
         this.isWillPlay = startPlaying;
@@ -163,8 +180,11 @@ public abstract class AbstractPlayer {
 
     /**
      * check empty point in current chess board
-     * @param point
-     * @return true if empty point
+     * @param plot
+     * @return true if not empty point
      */
-    public abstract boolean checkEmptySlot(Point point);
+    public boolean checkNotEmptySlot(Plot plot) {
+        return cache[plot.getY()][plot.getX()] != 0;
+    }
+
 }

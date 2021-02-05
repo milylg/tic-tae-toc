@@ -1,14 +1,18 @@
-package com.game.domain;
+package com.game.domain.value;
 
+import javafx.scene.effect.Light;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+
+import java.awt.*;
+import java.io.Serializable;
 
 /**
  * @author VIRIYA
  * @create 2020/10/23 23:16
  */
-public class Fork extends Path {
+public class Fork extends Path implements Serializable {
 
     public Fork() {
         MoveTo moveToStart = new MoveTo(0, 0);

@@ -9,9 +9,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * @author Administrator
+ *
+ * remote client for test
+ *
+ * @user : VIRIYA
+ * @create : 2020/12/5 15:49
  */
-public class GameLogic extends Application {
+public class RemoteLogic extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -20,12 +24,12 @@ public class GameLogic extends Application {
         primaryStage.setScene(new Scene(root, 300, 330));
         primaryStage.show();
 
-        // for easy test  to config network params
+        // for easy test to config network params
         NetworkService service = NetworkService.getInstance();
-        service.startListen(8888);
+        service.startListen(9999);
         ConnectParams message = new ConnectParams();
         message.setIp("127.0.0.1");
-        message.setPort("9999");
+        message.setPort("8888");
         service.config(message);
     }
 

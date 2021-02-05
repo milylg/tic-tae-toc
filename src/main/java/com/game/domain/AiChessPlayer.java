@@ -1,5 +1,8 @@
 package com.game.domain;
 
+import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Result;
+
 import java.util.Random;
 
 /**
@@ -13,15 +16,15 @@ public class AiChessPlayer extends AbstractPlayer {
     private static final int MAX_DEPTH = 2;
 
     @Override
-    public Point startPlay() {
+    public Plot startPlay() {
         clearCache();
         return randomLocation();
     }
 
-    private Point randomLocation() {
-        return new Point()
-                .setX(random.nextInt(3))
-                .setY(random.nextInt(3));
+    private Plot randomLocation() {
+        return Plot.builder()
+                .setX(random.nextInt(MAX_ROW))
+                .setY(random.nextInt(MAX_COL));
     }
 
     /**
@@ -29,15 +32,13 @@ public class AiChessPlayer extends AbstractPlayer {
      *
      * because is possibility that test case is error
      *
-     * TODO: Use MaxMinValue algorithm to resolve it
-     *
      * @return null if AI is loser
      */
     @Override
-    public Point play() {
-        Point point = maxMinValue(MAX_DEPTH);
-        flushChessBoard(point, chessType);
-        return point;
+    public Plot play() {
+        Plot plot = maxMinValue(MAX_DEPTH);
+        flushChessBoard(plot, chessType);
+        return plot;
     }
 
     /**
@@ -51,8 +52,8 @@ public class AiChessPlayer extends AbstractPlayer {
      * @param depth track back depth
      * @return random point in points that let ai player wined game
      */
-    private Point maxMinValue(int depth) {
-        Point[] bestMove = new Point[9];
+    private Plot maxMinValue(int depth) {
+        Plot[] bestMove = new Plot[9];
         int index = 0;
         int betaValue = ScoreRule.LOSE, alphaValue = ScoreRule.WIN;
         int chessTypeValue = chessType.value();
@@ -66,10 +67,10 @@ public class AiChessPlayer extends AbstractPlayer {
                     if (betaValue < minValue) {
                         betaValue = minValue;
                         index = 0;
-                        bestMove[index] = new Point().setX(col).setY(row);
+                        bestMove[index] = new Plot().setX(col).setY(row);
                     } else if (betaValue == minValue) {
                         index ++;
-                        bestMove[index] = new Point().setX(col).setY(row);
+                        bestMove[index] = new Plot().setX(col).setY(row);
                     }
                     cache[row][col] = emptyValue;
                 }
@@ -133,7 +134,7 @@ public class AiChessPlayer extends AbstractPlayer {
         return bestValue;
     }
 
-    private static final Point[][] WIN_STATUS = Point.buildGroup(new int[][]{
+    private static final Plot[][] WIN_STATUS = Plot.buildGroup(new int[][]{
             {0, 0, 0, 1, 0, 2},
             {1, 0, 1, 1, 1, 2},
             {2, 0, 2, 1, 2, 2},
@@ -164,8 +165,8 @@ public class AiChessPlayer extends AbstractPlayer {
         }
 
         private int getDoubleLinkValue() {
-            int[] finds = new int[2];
-            for (Point[] p : WIN_STATUS) {
+            int ai = 0, self = 0;
+            for (Plot[] p : WIN_STATUS) {
                 int chess = 0;
                 boolean hasEmpty = false;
                 int count = 0;
@@ -182,18 +183,18 @@ public class AiChessPlayer extends AbstractPlayer {
                     }
                 }
                 if (hasEmpty && count > 1) {
-                    if (chess == -1) {
-                        finds[0] ++;
+                    if (chess == ChessEnumType.FORK.value()) {
+                        ai ++;
                     } else {
-                        finds[1] ++;
+                        self ++;
                     }
                 }
             }
             // check if two in one line
-            if (finds[1] > 0) {
+            if (self > 0) {
                 return -DOUBLE_LINK;
             }
-            if (finds[0] > 0) {
+            if (ai > 0) {
                 return DOUBLE_LINK;
             }
             return CONTINUE;

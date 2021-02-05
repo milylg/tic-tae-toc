@@ -1,8 +1,6 @@
 package com.game.domain;
 
 
-import com.game.service.NetworkService;
-
 /**
  * @author VIRIYA
  * @create 2020/10/24 2:15
@@ -17,12 +15,12 @@ public class RemoteChessPlayer extends AbstractPlayer {
      * @return a point that current player choose
      */
     @Override
-    public Point play() {
+    public Plot play() {
         return null;
     }
 
     @Override
-    public Point startPlay() {
+    public Plot startPlay() {
         return null;
     }
 

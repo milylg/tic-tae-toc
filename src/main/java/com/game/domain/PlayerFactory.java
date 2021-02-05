@@ -1,5 +1,7 @@
 package com.game.domain;
 
+import com.game.domain.value.PlayerEnumType;
+
 import java.util.EnumMap;
 
 /**

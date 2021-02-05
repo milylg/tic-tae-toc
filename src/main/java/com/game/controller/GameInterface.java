@@ -1,9 +1,13 @@
 package com.game.controller;
 
 import com.game.domain.*;
+import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Result;
 import com.game.net.ChessLocation;
 import com.game.service.NetworkService;
 import javafx.application.Platform;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.fxml.FXML;
@@ -19,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * @author VIRIYA
@@ -37,24 +42,19 @@ public class GameInterface {
     @FXML
     private Button net;
 
-    private AbstractPlayer chessPlayer;
-    private NetworkService networkService;
+    private static AbstractPlayer chessPlayer;
+    private static NetworkService networkService;
 
-    private boolean isRemotePlayer = false;
-
-
-    private boolean isSuccessConnect = false;
-    private boolean isStartPlay = true;
-
+    private static boolean isRemotePlayer = false;
 
     @FunctionalInterface
     public interface FlushBoardCallback {
         /**
          * service invoke it to flush view
-         * @param point
+         * @param plot
          * @param type
          */
-        void call(Point point, ChessEnumType type);
+        void call(Plot plot, ChessEnumType type);
     }
 
     @FunctionalInterface
@@ -62,9 +62,59 @@ public class GameInterface {
         void call(Result result);
     }
 
+    @FunctionalInterface
+    public  interface FirstPlayCallback {
+        default void createRemotePlayer() {
+            chessPlayer = PlayerFactory.createRemotePlayer()
+                    .setChoose(true)
+                    .setChessType(ChessEnumType.FORK)
+                    .clearCache();
+            isRemotePlayer = true;
+        }
+        void call();
+    }
+
     public GameInterface() {
         networkService = NetworkService.getInstance();
+    }
 
+    @FXML
+    public void initialize() {
+
+        // call back flush board chess
+        networkService.addFlushBoardCallBack(((point, type) -> {
+
+            Platform.runLater(() -> {
+                if (type == ChessEnumType.FORK) {
+                    flush(new Fork(), point);
+                } else {
+                    flush(new Circle(50), point);
+                }
+                if (chessPlayer != null) {
+                    chessPlayer.flushChessBoard(point, type);
+                }
+            });
+        }));
+
+        networkService.addHitMessageCallback((result -> {
+            Platform.runLater(() -> {
+                buildWindow(result);
+            });
+        }));
+
+        networkService.addFirstCallback(() -> {
+            Platform.runLater(() -> {
+                // show first play panel
+                buildFirstPlayPane();
+                clearCheeses();
+            });
+            // chessPlayer.setWillPlay(networkService.isFirst());
+            networkService.connect();
+//            // TODO: refactor it
+//            networkService.send("FIRST:" + chessPlayer.isFirstPlay());
+//            logger.info("I first play? : " + (chessPlayer.isFirstPlay() ? "yes": "no"));
+        });
+        logger.info("controller initialize");
     }
 
 
@@ -77,7 +127,7 @@ public class GameInterface {
                 .clearCache()
                 .setChoose(true)
                 .setStartPlay(true);
-        Point location = chessPlayer.startPlay();
+        Plot location = chessPlayer.startPlay();
         chessPlayer.flushChessBoard(location, ChessEnumType.FORK);
         flush(chessPlayer.createShape(), location);
     }
@@ -86,10 +136,7 @@ public class GameInterface {
 
     @FXML
     public void clickNet(ActionEvent event) {
-        // operate filter
-
         clearCheeses();
-
         isRemotePlayer = true;
         if (!networkService.getConnectResult()) {
             boolean isConnected = networkService.connect();
@@ -103,32 +150,17 @@ public class GameInterface {
 
         // chess type is fork when first play
         chessPlayer = PlayerFactory.createRemotePlayer()
-                .setChessType(isStartPlay ? ChessEnumType.FORK : ChessEnumType.CIRCLE)
+                .setChessType(ChessEnumType.CIRCLE)
                 .setChoose(true)
                 .clearCache();
 
+        sendRequestForStartGame();
+    }
 
-        // call back flush board chess
-        networkService.addFlushBoardCallBack(((point, type) -> {
-            logger.info("exec1");
-            Platform.runLater(() -> {
-                logger.info("exec2");
-                if (type == ChessEnumType.FORK) {
-                    logger.info("exec3");
-                    flush(new Fork(), point);
-                } else {
-                    logger.info("exec3");
-                    flush(new Circle(), point);
-                }
-                chessPlayer.flushChessBoard(point, type);
-            });
-        }));
 
-        networkService.addHitMessageCallback((result -> {
-            Platform.runLater(() -> {
-                buildWindow(result);
-            });
-        }));
+    // TODO: define type of message
+    private void sendRequestForStartGame() {
+        networkService.send("REQUEST");
     }
 
     /**
@@ -138,10 +170,13 @@ public class GameInterface {
      */
     @FXML
     public void clickGrid(MouseEvent event) {
+
         if (!isRemotePlayer) {
             actionAiPlayerFor(event);
+            logger.info("with ai player");
         } else {
             actionRemotePlayerFor(event);
+            logger.info("with remote player");
         }
     }
 
@@ -150,18 +185,27 @@ public class GameInterface {
         if (!networkService.getConnectResult()) {
             return;
         }
+
+        logger.info("Now, I can play ?" + (networkService.isFirst() ? "yes" : "no"));
+
+        if (!networkService.isFirst()) {
+            return;
+        }
+
         // action of current player
         // how choose chess type of player
-        Point point = new Point(event.getX(), event.getY());
-        ChessLocation location = ChessLocation.build(point, chessPlayer.getChessType());
-        chessPlayer.flushChessBoard(point, chessPlayer.getChessType());
+        Plot plot = new Plot(event.getX(), event.getY());
+        ChessLocation location = ChessLocation.build(plot, chessPlayer.getChessType());
+        chessPlayer.flushChessBoard(plot, chessPlayer.getChessType());
         // flush chess broad of current player
-        flush(chessPlayer.createShape(), point);
+        flush(chessPlayer.createShape(), plot);
 
         Result gameResult = chessPlayer.gameResult();
+        // notify remote chess board
+        networkService.send(location);
+        networkService.setFirst(false);
+        logger.info("Now, I can play ?" + (networkService.isFirst() ? "yes" : "no"));
         if (gameResult == Result.CONTINUE) {
-            // notify remote chess board
-            networkService.send(location);
             return ;
         }
         buildWindow(gameResult);
@@ -177,25 +221,25 @@ public class GameInterface {
 
             Circle circle = new Circle(50);
             circle.setVisible(true);
-            Point point = new Point(event.getX(), event.getY());
-            logger.info("people click x = {}, y = {}", point.getX(), point.getY());
+            Plot plot = new Plot(event.getX(), event.getY());
+            logger.info("people click x = {}, y = {}", plot.getX(), plot.getY());
 
-            if (chessPlayer.checkNotEmptySlot(point)) {
+            if (chessPlayer.checkNotEmptySlot(plot)) {
                 return;
             }
-            flush(circle, point);
-            chessPlayer.flushChessBoard(point, ChessEnumType.CIRCLE);
+            flush(circle, plot);
+            chessPlayer.flushChessBoard(plot, ChessEnumType.CIRCLE);
             chessPlayer.setWillPlay(true);
             Result result = chessPlayer.gameResult();
             logger.info("people after game result is {}", result);
 
-            // AI or Network player can play chess
+            // AI player can play chess
             if (result == Result.CONTINUE) {
-                Point pointOfAiOrRemote = chessPlayer.play();
-                logger.info("AI click x = {}, y = {}", pointOfAiOrRemote.getX(), pointOfAiOrRemote.getY());
+                Plot plotOfAi = chessPlayer.play();
+                logger.info("AI click x = {}, y = {}", plotOfAi.getX(), plotOfAi.getY());
                 chessPlayer.setWillPlay(false);
-                flush(chessPlayer.createShape(), pointOfAiOrRemote);
-                chessPlayer.flushChessBoard(pointOfAiOrRemote, ChessEnumType.FORK);
+                flush(chessPlayer.createShape(), plotOfAi);
+                chessPlayer.flushChessBoard(plotOfAi, ChessEnumType.FORK);
                 Result aiResult = chessPlayer.gameResult();
                 buildWindow(aiResult);
                 return;
@@ -205,16 +249,17 @@ public class GameInterface {
     }
 
 
-
-    private void flush(Shape shape, Point point) {
-        if (point != null) {
-            box.add(shape, point.getX(), point.getY());
+    @FXML
+    private void flush(Shape shape, Plot plot) {
+        if (plot != null) {
+            box.add(shape, plot.getX(), plot.getY());
         }
     }
 
     private void clearCheeses() {
         box.getChildren().clear();
         // without effect
+        box.setVisible(true);
         box.setHgap(1.0);
         box.setVgap(1.0);
         box.setGridLinesVisible(true);
@@ -226,6 +271,18 @@ public class GameInterface {
             Stage stage = new Stage();
             Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("network.fxml"));
             stage.setTitle("Network");
+            stage.setScene(new Scene(root, 280, 200));
+            stage.show();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+    }
+
+    private void buildFirstPlayPane() {
+        try {
+            Stage stage = new Stage();
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("firstplay.fxml"));
+            stage.setTitle("who first play?");
             stage.setScene(new Scene(root, 280, 200));
             stage.show();
         } catch (Exception e) {

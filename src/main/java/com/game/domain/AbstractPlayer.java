@@ -1,7 +1,10 @@
 package com.game.domain;
 
+import com.game.domain.value.ChessEnumType;
+import com.game.domain.value.Result;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 
 
 /**
@@ -12,7 +15,7 @@ public abstract class AbstractPlayer {
 
     protected static final int MAX_ROW = 3;
     protected static final int MAX_COL = 3;
-    public static final Shape DEFAULT_SHAPE = new Circle(50);
+    private static final int CHESS_CIRCLE_RADIUS = 50;
 
     protected int[][] cache;
     protected boolean isUsed;
@@ -25,12 +28,13 @@ public abstract class AbstractPlayer {
         cache = new int[3][3];
         isUsed = false;
         startPlay = false;
+        // default type
         chessType = ChessEnumType.CIRCLE;
     }
 
     public Shape createShape() {
         if (chessType == ChessEnumType.CIRCLE) {
-            Shape circle = new Circle(50);
+            Shape circle = new Circle(CHESS_CIRCLE_RADIUS);
             circle.setVisible(true);
             return circle;
         }
@@ -71,8 +75,13 @@ public abstract class AbstractPlayer {
         return chessType;
     }
 
-    public void flushChessBoard(Point point, ChessEnumType chessType) {
-        cache[point.getY()][point.getX()] = chessType.value();
+    public void flushChessBoard(Plot plot, ChessEnumType chessType) {
+        cache[plot.getY()][plot.getX()] = chessType.value();
+        //logChessBoardInfo();
+    }
+
+    @Ignore
+    private void logChessBoardInfo() {
         for (int row = 0; row < 3; row ++) {
             for (int col = 0; col < 3; col ++) {
                 System.out.print("  " + cache[row][col]);
@@ -145,7 +154,7 @@ public abstract class AbstractPlayer {
      *
      * @return point
      */
-    public abstract Point play();
+    public abstract Plot play();
 
     /**
      * judge self if wined
@@ -174,7 +183,7 @@ public abstract class AbstractPlayer {
      *
      * @return point
      */
-    public abstract Point startPlay();
+    public abstract Plot startPlay();
 
     public void setWillPlay(boolean startPlaying) {
         this.isWillPlay = startPlaying;
@@ -182,11 +191,11 @@ public abstract class AbstractPlayer {
 
     /**
      * check empty point in current chess board
-     * @param point
+     * @param plot
      * @return true if not empty point
      */
-    public boolean checkNotEmptySlot(Point point) {
-        return cache[point.getY()][point.getX()] != 0;
+    public boolean checkNotEmptySlot(Plot plot) {
+        return cache[plot.getY()][plot.getX()] != 0;
     }
 
 }

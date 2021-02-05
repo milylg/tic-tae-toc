@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane fx:controller="com.game.controller.FirstPlayInterface" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="330.0" prefWidth="300.0"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+
+    <top>
+        <Label prefHeight="15.0" prefWidth="250.0" text="agree request then first play chess"/>
+    </top>
+    <center>
+        <FlowPane>
+            <CheckBox fx:id="cbxFirst" mnemonicParsing="false" prefHeight="16.0" prefWidth="150.0" text="I first play"
+                      textFill="#f4611f"/>
+            <Button fx:id="agree" onAction="#play" mnemonicParsing="false" text="agree"/>
+            <Button fx:id="disagree" onAction="#display" mnemonicParsing="false" text="disagree"/>
+        </FlowPane>
+    </center>
+</BorderPane>

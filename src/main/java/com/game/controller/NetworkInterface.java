@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.regex.Pattern.compile;
 
 /**
  * @author VIRIYA
@@ -36,9 +35,6 @@ public class NetworkInterface {
     public TextField textTcpPort;
 
     @FXML
-    public CheckBox cbxFirst;
-
-    @FXML
     public Label labelListen;
 
     @FXML
@@ -53,8 +49,7 @@ public class NetworkInterface {
     public void clickOk(ActionEvent event) {
         ConnectMessage message = new ConnectMessage();
         message.setIp(textTcpIp.getText())
-                .setPort(textTcpPort.getText())
-                .setFirst(cbxFirst.isSelected());
+                .setPort(textTcpPort.getText());
         if (message.isLegitimate()) {
             NetworkService.getInstance().config(message);
             return;

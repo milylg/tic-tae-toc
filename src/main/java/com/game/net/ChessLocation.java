@@ -1,7 +1,7 @@
 package com.game.net;
 
-import com.game.domain.ChessEnumType;
-import com.game.domain.Point;
+import com.game.domain.value.ChessEnumType;
+import com.game.domain.Plot;
 
 import java.io.Serializable;
 
@@ -10,20 +10,20 @@ import java.io.Serializable;
  * @create : 2020/11/28 21:17
  */
 public class ChessLocation implements Serializable {
-    private Point point;
+    private Plot plot;
     private ChessEnumType chessEnumType;
 
-    private ChessLocation(Point point, ChessEnumType chessEnumType) {
+    private ChessLocation(Plot plot, ChessEnumType chessEnumType) {
         this.chessEnumType = chessEnumType;
-        this.point = point;
+        this.plot = plot;
     }
 
-    public static ChessLocation build(Point point, ChessEnumType chessEnumType) {
-        return new ChessLocation(point, chessEnumType);
+    public static ChessLocation build(Plot plot, ChessEnumType chessEnumType) {
+        return new ChessLocation(plot, chessEnumType);
     }
 
-    public Point getPoint() {
-        return point;
+    public Plot getPoint() {
+        return plot;
     }
 
     public ChessEnumType getChessEnumType() {
@@ -33,7 +33,7 @@ public class ChessLocation implements Serializable {
     @Override
     public String toString() {
         return "ChessLocation{" +
-                "point=" + point +
+                "point=" + plot +
                 ", chessEnumType=" + chessEnumType +
                 '}';
     }

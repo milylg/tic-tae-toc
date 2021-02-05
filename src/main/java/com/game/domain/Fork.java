@@ -1,8 +1,11 @@
 package com.game.domain;
 
+import javafx.scene.effect.Light;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+
+import java.awt.*;
 
 /**
  * @author VIRIYA

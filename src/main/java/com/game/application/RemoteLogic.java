@@ -9,10 +9,10 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 /**
- * @author Administrator
+ * @user : VIRIYA
+ * @create : 2020/12/5 15:49
  */
-public class GameLogic extends Application {
-
+public class RemoteLogic extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("main.fxml"));
@@ -20,10 +20,10 @@ public class GameLogic extends Application {
         primaryStage.setScene(new Scene(root, 300, 330));
         primaryStage.show();
         NetworkService service = NetworkService.getInstance();
-        service.startListen(8888);
+        service.startListen(9999);
         ConnectMessage message = new ConnectMessage();
         message.setIp("127.0.0.1");
-        message.setPort("9999");
+        message.setPort("8888");
         service.config(message);
     }
 

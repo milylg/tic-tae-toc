@@ -2,7 +2,7 @@ package com.game.service;
 
 
 import com.game.controller.GameInterface;
-import com.game.domain.Result;
+import com.game.domain.value.Result;
 import com.game.net.ChessLocation;
 import com.game.net.ConnectMessage;
 import org.slf4j.Logger;
@@ -25,12 +25,13 @@ public class NetworkService {
 
     private boolean isSuccessConnect = false;
 
-    private boolean isFirstPlay = false;
     private String ip;
     private int port;
+    private boolean isFirst = false;
 
     private GameInterface.FlushBoardCallback flushBoardCallback;
     private GameInterface.HitMessageCallback hitMessageCallback;
+    private GameInterface.FirstPlayCallback firstPlayCallback;
 
 
     private NetworkService() {
@@ -50,6 +51,10 @@ public class NetworkService {
 
     public void addHitMessageCallback(GameInterface.HitMessageCallback hitMessageCallback) {
         this.hitMessageCallback = hitMessageCallback;
+    }
+
+    public void addFirstCallback(GameInterface.FirstPlayCallback firstPlayCallback) {
+        this.firstPlayCallback = firstPlayCallback;
     }
 
 
@@ -77,7 +82,7 @@ public class NetworkService {
                 // get socket from queue
                 server = serverSocket.accept();
                 // new thread for deal with connect of socket
-                new HandlerThread(server).start();
+                new SocketHandlerThread(server).start();
             } catch (Exception e) {
                 logger.error("Server runtime exception: " + e.getMessage());
             }
@@ -99,11 +104,11 @@ public class NetworkService {
     }
 
 
-    private class HandlerThread extends Thread {
+    private class SocketHandlerThread extends Thread {
 
         private Socket sock;
 
-        public HandlerThread(Socket socket) {
+        public SocketHandlerThread(Socket socket) {
             this.sock = socket;
         }
 
@@ -113,6 +118,7 @@ public class NetworkService {
                 while (true) {
                     InputStream inputStream = sock.getInputStream();
                     // here blocked when without message come here
+                    // TODO: refactor it: get system resources is too more!!!
                     if (inputStream.available() > 0) {
                         ObjectInputStream ios = new ObjectInputStream(inputStream);
                         // read data from client
@@ -122,11 +128,39 @@ public class NetworkService {
                         // message class type : 1. ChessLocation 2. Result
                         if (message instanceof ChessLocation) {
                             flushBoardCallback.call(((ChessLocation) message).getPoint(), ((ChessLocation) message).getChessEnumType());
+                            setFirst(true);
                         } else if (message instanceof Result) {
                             // call back game result dialog
                             hitMessageCallback.call((Result) message);
                         } else {
-                            // TODO: How judge who is first player
+                            // ack for request of another client
+                            // callback method to show panel that who is first play
+                            if (message.equals("REQUEST")) {
+
+                                firstPlayCallback.createRemotePlayer();
+                                firstPlayCallback.call();
+                                logger.info("first play");
+                            }
+                            if (message.equals("AGREE:true")) {
+                                logger.info("partner already agree to play game");
+                                setFirst(false);
+                            }
+                            if (message.equals("AGREE:false")) {
+                                logger.info("");
+                                setFirst(true);
+                            }
+                            if (message.equals("DISAGREE")) {
+                                setFirst(false);
+                                logger.info("partner disagree it, Sorry!");
+                            }
+
+                            if (message.equals("FIRST:true")) {
+                                isFirst = false;
+                            }
+                            if (message.equals("FIRST:false")) {
+                                isFirst = true;
+                            }
+
                             // response client
                             ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
                             oos.writeObject("ACK");
@@ -147,8 +181,6 @@ public class NetworkService {
     public void config(ConnectMessage message) {
         this.ip = message.ip();
         this.port = message.port();
-        // don't need
-        this.isFirstPlay = message.firstPlay();
     }
 
     private ObjectOutputStream out = null;
@@ -193,12 +225,11 @@ public class NetworkService {
         return isSuccessConnect;
     }
 
-    public boolean getFirstPlay() {
-        return isFirstPlay;
+    public boolean isFirst() {
+        return isFirst;
     }
 
-    public void setFirstPlay(boolean firstPlay) {
-        this.isFirstPlay = firstPlay;
+    public void setFirst(boolean first) {
+        isFirst = first;
     }
-
 }

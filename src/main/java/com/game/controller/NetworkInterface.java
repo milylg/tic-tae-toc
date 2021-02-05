@@ -1,6 +1,6 @@
 package com.game.controller;
 
-import com.game.net.ConnectMessage;
+import com.game.net.ConnectParams;
 import com.game.service.NetworkService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,7 +47,7 @@ public class NetworkInterface {
      */
     @FXML
     public void clickOk(ActionEvent event) {
-        ConnectMessage message = new ConnectMessage();
+        ConnectParams message = new ConnectParams();
         message.setIp(textTcpIp.getText())
                 .setPort(textTcpPort.getText());
         if (message.isLegitimate()) {

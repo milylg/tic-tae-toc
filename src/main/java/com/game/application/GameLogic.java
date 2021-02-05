@@ -1,6 +1,6 @@
 package com.game.application;
 
-import com.game.net.ConnectMessage;
+import com.game.net.ConnectParams;
 import com.game.service.NetworkService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -23,7 +23,7 @@ public class GameLogic extends Application {
         // for easy test  to config network params
         NetworkService service = NetworkService.getInstance();
         service.startListen(8888);
-        ConnectMessage message = new ConnectMessage();
+        ConnectParams message = new ConnectParams();
         message.setIp("127.0.0.1");
         message.setPort("9999");
         service.config(message);

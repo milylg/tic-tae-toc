@@ -20,14 +20,12 @@ public abstract class AbstractPlayer {
     private static final int CHESS_CIRCLE_RADIUS = 50;
 
     protected int[][] cache;
-    protected boolean startPlay;
     protected ChessEnumType chessType;
     protected boolean isWillPlay;
 
 
     public AbstractPlayer() {
         cache = new int[3][3];
-        startPlay = false;
     }
 
     public Shape createShape() {
@@ -47,15 +45,6 @@ public abstract class AbstractPlayer {
             }
         }
         return this;
-    }
-
-    public AbstractPlayer setStartPlay(boolean isFirst) {
-        this.startPlay = isFirst;
-        return this;
-    }
-
-    public boolean isFirstPlay() {
-        return startPlay;
     }
 
 

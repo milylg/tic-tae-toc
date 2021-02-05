@@ -2,9 +2,9 @@ package com.game.service;
 
 
 import com.game.controller.GameInterface;
-import com.game.domain.value.Result;
-import com.game.net.ChessLocation;
-import com.game.net.ConnectMessage;
+import com.game.net.ConnectParams;
+import com.game.net.protocol.ConnectBehavior;
+import com.game.net.protocol.Protocol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +14,10 @@ import java.net.*;
 /**
  * @author VIRIYA
  * @create 2020/10/24 10:40
+ *
+ * TODO: SOCKET THREAD WILL CLOSED WHEN APPLICATION CLOSED
  */
-public class NetworkService {
+public class NetworkService implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger("com.game.service");
 
@@ -82,7 +84,7 @@ public class NetworkService {
                 // get socket from queue
                 server = serverSocket.accept();
                 // new thread for deal with connect of socket
-                new SocketHandlerThread(server).start();
+                new ProtocolReceiveHandlerThread(server).start();
             } catch (Exception e) {
                 logger.error("Server runtime exception: " + e.getMessage());
             }
@@ -90,11 +92,9 @@ public class NetworkService {
     }
 
 
-    public boolean send(Object message) {
+    public boolean send(Protocol message) {
         try {
-            ObjectOutputStream  oos = new ObjectOutputStream(client.getOutputStream());
-            oos.writeObject(message);
-            oos.flush();
+            specifySend(client, message);
         } catch (IOException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -104,11 +104,11 @@ public class NetworkService {
     }
 
 
-    private class SocketHandlerThread extends Thread {
+    private class ProtocolReceiveHandlerThread extends Thread {
 
         private Socket sock;
 
-        public SocketHandlerThread(Socket socket) {
+        public ProtocolReceiveHandlerThread(Socket socket) {
             this.sock = socket;
         }
 
@@ -122,50 +122,12 @@ public class NetworkService {
                     if (inputStream.available() > 0) {
                         ObjectInputStream ios = new ObjectInputStream(inputStream);
                         // read data from client
-                        Object message = ios.readObject();
+                        Protocol message = (Protocol) ios.readObject();
                         logger.info("recv message : " + message);
 
-                        // message class type : 1. ChessLocation 2. Result
-                        if (message instanceof ChessLocation) {
-                            flushBoardCallback.callbackFlushView(((ChessLocation) message).getPoint(), ((ChessLocation) message).getChessEnumType());
-                            setFirst(true);
-                        } else if (message instanceof Result) {
-                            // call back game result dialog
-                            hitMessageCallback.showHintMessageDialog((Result) message);
-                        } else {
-                            // ack for request of another client
-                            // callback method to show panel that who is first play
-                            if (message.equals("REQUEST")) {
-
-                                firstPlayCallback.createRemotePlayer();
-                                firstPlayCallback.buildSelectFirstPlayDialog();
-                                logger.info("first play");
-                            }
-                            if (message.equals("AGREE:true")) {
-                                logger.info("partner already agree to play game");
-                                setFirst(false);
-                            }
-                            if (message.equals("AGREE:false")) {
-                                logger.info("");
-                                setFirst(true);
-                            }
-                            if (message.equals("DISAGREE")) {
-                                setFirst(false);
-                                logger.info("partner disagree it, Sorry!");
-                            }
-
-                            if (message.equals("FIRST:true")) {
-                                isFirst = false;
-                            }
-                            if (message.equals("FIRST:false")) {
-                                isFirst = true;
-                            }
-
-                            // response client
-                            ObjectOutputStream oos = new ObjectOutputStream(sock.getOutputStream());
-                            oos.writeObject("ACK");
-                            oos.flush();
-                        }
+                        message.needExecutor(networkService);
+                        message.socket(sock);
+                        message.execute();
                     }
                 }
             } catch (Exception e) {
@@ -178,7 +140,17 @@ public class NetworkService {
     }
 
 
-    public void config(ConnectMessage message) {
+    /**
+     * send message to another player
+     */
+    public void specifySend(Socket socket, Protocol message) throws IOException {
+        ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+        oos.writeObject(message);
+        oos.flush();
+    }
+
+
+    public void config(ConnectParams message) {
         this.ip = message.ip();
         this.port = message.port();
     }
@@ -202,10 +174,7 @@ public class NetworkService {
 
         try {
             client = new Socket(ip, port);
-            out = new ObjectOutputStream(client.getOutputStream());
-            out.writeObject("First");
-            out.flush();
-
+            specifySend(client, new ConnectBehavior());
             logger.info("client create finished");
 
             in = new ObjectInputStream(client.getInputStream());
@@ -230,5 +199,17 @@ public class NetworkService {
 
     public void setFirst(boolean first) {
         isFirst = first;
+    }
+
+    public GameInterface.FlushBoardCallback getFlushBoardCallback() {
+        return flushBoardCallback;
+    }
+
+    public GameInterface.HitMessageCallback getHitMessageCallback() {
+        return hitMessageCallback;
+    }
+
+    public GameInterface.FirstPlayCallback getFirstPlayCallback() {
+        return firstPlayCallback;
     }
 }

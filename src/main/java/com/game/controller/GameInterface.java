@@ -6,6 +6,9 @@ import com.game.domain.value.Fork;
 import com.game.domain.value.Plot;
 import com.game.domain.value.Result;
 import com.game.net.ChessLocation;
+import com.game.net.protocol.NotifyGameResultBehavior;
+import com.game.net.protocol.PlayChessBehavior;
+import com.game.net.protocol.StartGameRequestBeHavior;
 import com.game.service.NetworkService;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -111,8 +114,7 @@ public class GameInterface {
         isRemotePlayer = false;
         chessPlayer = PlayerFactory.createAiPlayer()
                 .setChessType(ChessEnumType.FORK)
-                .clearChessCache()
-                .setStartPlay(true);
+                .clearChessCache();
         Plot location = chessPlayer.startPlay();
         chessPlayer.flushChessBoard(location, ChessEnumType.FORK);
         flush(chessPlayer.createShape(), location);
@@ -150,9 +152,9 @@ public class GameInterface {
     }
 
 
-    // TODO: define type of message
     private void sendRequestForStartGame() {
-        networkService.send("REQUEST");
+        StartGameRequestBeHavior startGameRequest = new StartGameRequestBeHavior();
+        networkService.send(startGameRequest);
     }
 
     /**
@@ -187,14 +189,16 @@ public class GameInterface {
         // action of current player
         // how choose chess type of player
         Plot plot = new Plot(event.getX(), event.getY());
-        ChessLocation location = ChessLocation.build(plot, chessPlayer.getChessType());
         chessPlayer.flushChessBoard(plot, chessPlayer.getChessType());
         // flush chess broad of current player
         flush(chessPlayer.createShape(), plot);
 
         Result gameResult = chessPlayer.gameResult();
         // notify remote chess board
-        networkService.send(location);
+        PlayChessBehavior playChessBehavior = new PlayChessBehavior();
+        playChessBehavior.setLocation(plot);
+        playChessBehavior.setType(chessPlayer.getChessType());
+        networkService.send(playChessBehavior);
         networkService.setFirst(false);
         logger.info("Now, I can play ?" + (networkService.isFirst() ? " yes" : " no"));
         if (gameResult == Result.CONTINUE) {
@@ -206,15 +210,19 @@ public class GameInterface {
     }
 
     private void sendGameResultToPartner(Result gameResult) {
+        NotifyGameResultBehavior notifyGameResultBehavior = new NotifyGameResultBehavior();
         switch (gameResult) {
             case WIN:
-                networkService.send(Result.LOSE);
+                notifyGameResultBehavior.setGameResult(Result.LOSE);
+                networkService.send(notifyGameResultBehavior);
                 break;
             case LOSE:
-                networkService.send(Result.WIN);
+                notifyGameResultBehavior.setGameResult(Result.WIN);
+                networkService.send(notifyGameResultBehavior);
                 break;
             case DRAW:
-                networkService.send(Result.DRAW);
+                notifyGameResultBehavior.setGameResult(Result.DRAW);
+                networkService.send(notifyGameResultBehavior);
                 break;
             default:
                 break;
@@ -277,7 +285,8 @@ public class GameInterface {
     private void buildConfigNetworkPane() {
         try {
             Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("network.fxml"));
+            Parent root = FXMLLoader.load(
+                    getClass().getClassLoader().getResource("network.fxml"));
             stage.setTitle("Network");
             stage.setScene(new Scene(root, 280, 200));
             stage.show();
@@ -289,7 +298,8 @@ public class GameInterface {
     private void buildFirstPlayPane() {
         try {
             Stage stage = new Stage();
-            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("firstplay.fxml"));
+            Parent root = FXMLLoader.load(
+                    getClass().getClassLoader().getResource("firstplay.fxml"));
             stage.setTitle("who first play?");
             stage.setScene(new Scene(root, 280, 200));
             stage.show();
@@ -314,6 +324,6 @@ public class GameInterface {
         // connect direct player util ensure to start
         buildConfigNetworkPane();
 
-        // here is not prefect, so refactor it
+        // TODO: here is not prefect, so refactor it
     }
 }

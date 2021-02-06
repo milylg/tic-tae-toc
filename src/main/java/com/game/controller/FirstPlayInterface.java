@@ -1,7 +1,7 @@
 package com.game.controller;
 
 import com.game.net.protocol.AgreeJoinGameBehavior;
-import com.game.service.NetworkService;
+import com.game.net.Network;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -19,7 +19,7 @@ public class FirstPlayInterface {
 
     @FXML
     public void play(Event event) {
-        NetworkService network = NetworkService.getInstance();
+        Network network = Network.getInstance();
 
         if (GameInterface.connectPartner(network)) {
             return;
@@ -35,7 +35,7 @@ public class FirstPlayInterface {
 
     @FXML
     public void display(Event event) {
-        NetworkService network = NetworkService.getInstance();
+        Network network = Network.getInstance();
         if (GameInterface.connectPartner(network)) {
             return;
         }

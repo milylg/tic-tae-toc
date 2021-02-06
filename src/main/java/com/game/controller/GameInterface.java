@@ -5,11 +5,10 @@ import com.game.domain.value.ChessEnumType;
 import com.game.domain.value.Fork;
 import com.game.domain.value.Plot;
 import com.game.domain.value.Result;
-import com.game.net.ChessLocation;
 import com.game.net.protocol.NotifyGameResultBehavior;
 import com.game.net.protocol.PlayChessBehavior;
 import com.game.net.protocol.StartGameRequestBeHavior;
-import com.game.service.NetworkService;
+import com.game.net.Network;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -36,7 +35,7 @@ public class GameInterface {
     private static Logger logger = LoggerFactory.getLogger("com.game.controller");
 
     private static AbstractPlayer chessPlayer;
-    private static NetworkService networkService;
+    private static Network network;
     private static boolean isRemotePlayer = false;
 
     @FXML
@@ -69,14 +68,14 @@ public class GameInterface {
     }
 
     public GameInterface() {
-        networkService = NetworkService.getInstance();
+        network = Network.getInstance();
     }
 
     @FXML
     public void initialize() {
 
         // call back flush board chess
-        networkService.addFlushBoardCallBack(((point, type) -> {
+        network.addFlushBoardCallBack(((point, type) -> {
 
             Platform.runLater(() -> {
                 if (type == ChessEnumType.FORK) {
@@ -90,19 +89,19 @@ public class GameInterface {
             });
         }));
 
-        networkService.addHitMessageCallback((result -> {
+        network.addHitMessageCallback((result -> {
             Platform.runLater(() -> {
                 buildWindow(result);
             });
         }));
 
-        networkService.addFirstCallback(() -> {
+        network.addFirstCallback(() -> {
             Platform.runLater(() -> {
                 // show first play panel
                 buildFirstPlayPane();
                 clearCheeses();
             });
-            networkService.connect();
+            network.connect();
         });
         logger.info("controller initialize");
     }
@@ -126,7 +125,7 @@ public class GameInterface {
     public void clickNet(ActionEvent event) {
         clearCheeses();
         isRemotePlayer = true;
-        if (connectPartner(networkService)) {
+        if (connectPartner(network)) {
             return;
         }
 
@@ -138,9 +137,9 @@ public class GameInterface {
         sendRequestForStartGame();
     }
 
-    static boolean connectPartner(NetworkService networkService) {
-        if (!networkService.getConnectResult()) {
-            boolean isConnected = networkService.connect();
+    static boolean connectPartner(Network network) {
+        if (!network.getConnectResult()) {
+            boolean isConnected = network.connect();
             if (!isConnected) {
                 Dialog<ButtonType> error = new Alert(Alert.AlertType.ERROR);
                 error.setContentText("Failed to connect to the another player.");
@@ -154,7 +153,7 @@ public class GameInterface {
 
     private void sendRequestForStartGame() {
         StartGameRequestBeHavior startGameRequest = new StartGameRequestBeHavior();
-        networkService.send(startGameRequest);
+        network.send(startGameRequest);
     }
 
     /**
@@ -176,13 +175,13 @@ public class GameInterface {
 
 
     private void actionRemotePlayerFor(MouseEvent event) {
-        if (!networkService.getConnectResult()) {
+        if (!network.getConnectResult()) {
             return;
         }
 
-        logger.info("Now, I can play ?" + (networkService.isFirst() ? " yes" : " no"));
+        logger.info("Now, I can play ?" + (network.isFirst() ? " yes" : " no"));
 
-        if (!networkService.isFirst()) {
+        if (!network.isFirst()) {
             return;
         }
 
@@ -198,9 +197,9 @@ public class GameInterface {
         PlayChessBehavior playChessBehavior = new PlayChessBehavior();
         playChessBehavior.setLocation(plot);
         playChessBehavior.setType(chessPlayer.getChessType());
-        networkService.send(playChessBehavior);
-        networkService.setFirst(false);
-        logger.info("Now, I can play ?" + (networkService.isFirst() ? " yes" : " no"));
+        network.send(playChessBehavior);
+        network.setFirst(false);
+        logger.info("Now, I can play ?" + (network.isFirst() ? " yes" : " no"));
         if (gameResult == Result.CONTINUE) {
             return ;
         }
@@ -214,15 +213,15 @@ public class GameInterface {
         switch (gameResult) {
             case WIN:
                 notifyGameResultBehavior.setGameResult(Result.LOSE);
-                networkService.send(notifyGameResultBehavior);
+                network.send(notifyGameResultBehavior);
                 break;
             case LOSE:
                 notifyGameResultBehavior.setGameResult(Result.WIN);
-                networkService.send(notifyGameResultBehavior);
+                network.send(notifyGameResultBehavior);
                 break;
             case DRAW:
                 notifyGameResultBehavior.setGameResult(Result.DRAW);
-                networkService.send(notifyGameResultBehavior);
+                network.send(notifyGameResultBehavior);
                 break;
             default:
                 break;

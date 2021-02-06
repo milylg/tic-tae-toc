@@ -1,7 +1,7 @@
 package com.game.controller;
 
 import com.game.net.ConnectParams;
-import com.game.service.NetworkService;
+import com.game.net.Network;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -51,7 +51,7 @@ public class NetworkInterface {
         message.setIp(textTcpIp.getText())
                 .setPort(textTcpPort.getText());
         if (message.isLegitimate()) {
-            NetworkService.getInstance().config(message);
+            Network.getInstance().config(message);
             return;
         }
         showAlertMessage("Connect information is not legitimate.", Alert.AlertType.ERROR);
@@ -67,7 +67,7 @@ public class NetworkInterface {
         Pattern pattern = Pattern.compile("^[0-9]{4,5}$");
         Matcher matcher = pattern.matcher(serverIp.getText());
         if (matcher.matches()) {
-            NetworkService.getInstance().startListen(Integer.valueOf(serverIp.getText()));
+            Network.getInstance().startListen(Integer.valueOf(serverIp.getText()));
             labelListen.setText("starting");
             listenBtn.setVisible(false);
             logger.info("server listen port : {}", serverIp.getText());

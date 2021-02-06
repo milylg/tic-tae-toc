@@ -1,7 +1,7 @@
 package com.game.application;
 
 import com.game.net.ConnectParams;
-import com.game.service.NetworkService;
+import com.game.net.Network;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +21,7 @@ public class GameLogic extends Application {
         primaryStage.show();
 
         // for easy test  to config network params
-        NetworkService service = NetworkService.getInstance();
+        Network service = Network.getInstance();
         service.startListen(8888);
         ConnectParams message = new ConnectParams();
         message.setIp("127.0.0.1");

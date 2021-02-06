@@ -6,7 +6,7 @@ import org.junit.Test;
  * @author VIRIYA
  * @create 2020/10/24 13:20
  */
-public class RemoteChessPlayerTester {
+public class RemotePlayerTester {
 
     /**
      * A test case without assertions ensures

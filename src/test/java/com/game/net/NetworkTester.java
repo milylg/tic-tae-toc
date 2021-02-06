@@ -1,6 +1,5 @@
 package com.game.net;
 
-import com.game.service.NetworkService;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -64,12 +63,11 @@ public class NetworkTester {
     }
 
     public static void main(String[] args) {
-        NetworkService service = NetworkService.getInstance();
+        Network service = Network.getInstance();
         service.startListen(9999);
-        ConnectMessage message = new ConnectMessage();
+        ConnectParams message = new ConnectParams();
         message.setIp("127.0.0.1");
         message.setPort("9997");
-        message.setFirst(true);
         service.config(message);
     }
 

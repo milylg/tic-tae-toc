@@ -1,7 +1,6 @@
 package com.game.service;
 
-import junit.framework.TestCase;
-import org.junit.Test;
+import com.game.net.Network;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,12 +12,20 @@ public class NetworkServiceTest {
      *
      */
     public static void main(String[] args) {
-        NetworkService.build().startListen(8080);
+        Network.getInstance().startListen(8080);
     }
 
-    @Test
-    public void testConnect() {
-        boolean result = NetworkService.build().connect("localhost" , 8080);
-        assertTrue(result);
-    }
+//    @Test
+//    public void testConnect() {
+//        boolean result = Network.getInstance().connect("localhost" , 8080);
+//        assertTrue(result);
+//    }
+//
+//    @Test
+//    public void testSendMsg() {
+//        boolean isConnect = Network.getInstance().connect("localhost" , 8080);
+//        if (isConnect) {
+//            Network.getInstance().send("ssssss");
+//        }
+//    }
 }

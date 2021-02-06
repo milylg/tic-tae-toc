@@ -1,5 +1,6 @@
 package com.game.domain;
 
+import com.game.domain.value.ChessEnumType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -17,21 +18,21 @@ import static org.junit.Assert.assertTrue;
  * @create 2020/10/24 13:16
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest(AiChessPlayer.class)
-public class AiChessPlayerTester {
+@PrepareForTest(AiPlayer.class)
+public class AiPlayerTester {
 
-    private AiChessPlayer mockAiChessPlayerOn(int[][] chessBoard) {
+    private AiPlayer mockAiChessPlayerOn(int[][] chessBoard) {
 
-        AiChessPlayer aiChessPlayer = new AiChessPlayer();
+        AiPlayer aiPlayer = new AiPlayer();
         // mock private field of AiChessPlayer
-        int[][] cache = Whitebox.getInternalState(aiChessPlayer, "cache");
+        int[][] cache = Whitebox.getInternalState(aiPlayer, "cache");
 
         // status of chess board
         for (int i = 0; i < 3; i ++) {
             cache[i] = Arrays.copyOf(chessBoard[i],3);
         }
 
-        return aiChessPlayer;
+        return aiPlayer;
     }
 
     /**
@@ -50,13 +51,13 @@ public class AiChessPlayerTester {
                 {0, -1, 1},
                 {1,  1, 1}
         };
-        AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfForkWin);
+        AiPlayer aiPlayer = mockAiChessPlayerOn(chessBoardOfForkWin);
 
-        aiChessPlayer.setChessType(ChessEnumType.FORK);
-        assertFalse(aiChessPlayer.isWin());
+        aiPlayer.setChessType(ChessEnumType.FORK);
+        assertFalse(aiPlayer.isWin());
 
-        aiChessPlayer.setChessType(ChessEnumType.CIRCLE);
-        assertTrue(aiChessPlayer.isWin());
+        aiPlayer.setChessType(ChessEnumType.CIRCLE);
+        assertTrue(aiPlayer.isWin());
     }
 
     @Test
@@ -67,13 +68,13 @@ public class AiChessPlayerTester {
                 { 1,  1, -1},
                 {-1,  1,  1}
         };
-        AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfCircleWin);
+        AiPlayer aiPlayer = mockAiChessPlayerOn(chessBoardOfCircleWin);
 
-        aiChessPlayer.setChessType(ChessEnumType.CIRCLE);
-        assertTrue(aiChessPlayer.isWin());
+        aiPlayer.setChessType(ChessEnumType.CIRCLE);
+        assertTrue(aiPlayer.isWin());
 
-        aiChessPlayer.setChessType(ChessEnumType.FORK);
-        assertFalse(aiChessPlayer.isWin());
+        aiPlayer.setChessType(ChessEnumType.FORK);
+        assertFalse(aiPlayer.isWin());
     }
 
     @Test
@@ -83,8 +84,8 @@ public class AiChessPlayerTester {
                 {-1,  -1,  1},
                 {-1,  1, -1}
         };
-        AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfDraw);
-        assertTrue(aiChessPlayer.isDraw());
+        AiPlayer aiPlayer = mockAiChessPlayerOn(chessBoardOfDraw);
+        assertTrue(aiPlayer.isDraw());
         /**
          * need to pre judge is draw
          * for example :
@@ -102,8 +103,8 @@ public class AiChessPlayerTester {
                 { 0,  1, -1},
                 {-1,  0,  0}
         };
-        AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfWithoutDraw);
-        assertFalse(aiChessPlayer.isDraw());
+        AiPlayer aiPlayer = mockAiChessPlayerOn(chessBoardOfWithoutDraw);
+        assertFalse(aiPlayer.isDraw());
     }
 
 
@@ -115,9 +116,9 @@ public class AiChessPlayerTester {
                 {0, -1, 1},
                 {0, -1, 1}
         };
-        AiChessPlayer aiChessPlayer = mockAiChessPlayerOn(chessBoardOfForkLose);
-        aiChessPlayer.setChessType(ChessEnumType.FORK);
-        assertTrue(aiChessPlayer.isLose());
+        AiPlayer aiPlayer = mockAiChessPlayerOn(chessBoardOfForkLose);
+        aiPlayer.setChessType(ChessEnumType.FORK);
+        assertTrue(aiPlayer.isLose());
     }
 
 //    @Test

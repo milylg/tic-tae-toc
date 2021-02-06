@@ -10,8 +10,8 @@ public class PlayChessBehavior extends Protocol {
 
     @Override
     public void execute() {
-        networkService.getFlushBoardCallback().callbackFlushView(location, type);
-        networkService.setFirst(true);
+        network.getFlushBoardCallback().callbackFlushView(location, type);
+        network.setFirst(true);
     }
 
     public void setLocation(Plot location) {

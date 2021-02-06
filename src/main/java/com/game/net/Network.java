@@ -1,8 +1,7 @@
-package com.game.service;
+package com.game.net;
 
 
 import com.game.controller.GameInterface;
-import com.game.net.ConnectParams;
 import com.game.net.protocol.ConnectBehavior;
 import com.game.net.protocol.Protocol;
 import org.slf4j.Logger;
@@ -17,11 +16,11 @@ import java.net.*;
  *
  * TODO: SOCKET THREAD WILL CLOSED WHEN APPLICATION CLOSED
  */
-public class NetworkService implements Serializable {
+public class Network implements Serializable {
 
     private static final Logger logger = LoggerFactory.getLogger("com.game.service");
 
-    private static NetworkService networkService;
+    private static Network network;
     private Socket client;
     private Socket server;
 
@@ -36,15 +35,15 @@ public class NetworkService implements Serializable {
     private GameInterface.FirstPlayCallback firstPlayCallback;
 
 
-    private NetworkService() {
+    private Network() {
 
     }
 
-    public static NetworkService getInstance() {
-        if (networkService == null) {
-            networkService = new NetworkService();
+    public static Network getInstance() {
+        if (network == null) {
+            network = new Network();
         }
-        return networkService;
+        return network;
     }
 
     public void addFlushBoardCallBack(GameInterface.FlushBoardCallback flushBoardCallback) {
@@ -66,6 +65,9 @@ public class NetworkService implements Serializable {
     }
 
 
+    /**
+     * TODO: without add to FX ThreadGroup，so thead always run when application stop run
+     */
     private class TcpReceiveServer extends Thread {
 
         private int port;
@@ -125,7 +127,7 @@ public class NetworkService implements Serializable {
                         Protocol message = (Protocol) ios.readObject();
                         logger.info("recv message : " + message);
 
-                        message.needExecutor(networkService);
+                        message.needExecutor(network);
                         message.socket(sock);
                         message.execute();
                     }

@@ -6,8 +6,8 @@ public class StartGameRequestBeHavior extends Protocol {
 
     @Override
     public void execute() {
-        networkService.getFirstPlayCallback().createRemotePlayer();
-        networkService.getFirstPlayCallback().buildSelectFirstPlayDialog();
+        network.getFirstPlayCallback().createRemotePlayer();
+        network.getFirstPlayCallback().buildSelectFirstPlayDialog();
         logger.info("first play");
     }
 

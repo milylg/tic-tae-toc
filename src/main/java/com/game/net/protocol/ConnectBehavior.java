@@ -6,7 +6,7 @@ public class ConnectBehavior extends  Protocol{
     @Override
     public void execute() {
         try {
-            networkService.specifySend(socket, new ConnectResponseBehavior());
+            network.specifySend(socket, new ConnectResponseBehavior());
         } catch (IOException e) {
             logger.info("response exception:" + e.getMessage());
         }

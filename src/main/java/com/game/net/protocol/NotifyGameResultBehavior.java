@@ -10,7 +10,7 @@ public class NotifyGameResultBehavior extends Protocol {
 
     @Override
     public void execute() {
-        networkService.getHitMessageCallback().showHintMessageDialog(gameResult);
+        network.getHitMessageCallback().showHintMessageDialog(gameResult);
     }
 
     public void setGameResult(Result gameResult) {
